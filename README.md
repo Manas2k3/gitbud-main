@@ -1,59 +1,75 @@
-#Gibud
+# 🌱 Gibud
 
-Gibud is a Flutter-based mobile application designed to provide personalized health, wellness, and fitness experiences. This app focuses on delivering tailored solutions for users, including features like gut analysis and medical tracking.
+**Gibud** is a Flutter-based mobile application crafted to provide personalized **health, wellness, and fitness** experiences. The app includes intelligent features such as **gut analysis** and **medical tracking**, aiming to help users better understand and improve their well-being.
 
-The project integrates several key technologies and APIs, including Firebase, OneSignal, Razorpay, Gemini AI, and ZegoCloud, to deliver a rich, real-time, and intelligent user experience.
-🛠️ Getting Started
-Prerequisites
+The project leverages modern APIs and platforms like:
 
-    Flutter SDK: Latest stable version recommended
-    Dart SDK: Bundled with Flutter
-    IDE: Android Studio or VS Code
-    Git: Version control system
+- **Firebase** – for authentication and real-time database
+- **OneSignal** – for push notifications
+- **Razorpay** – for handling payments
+- **Gemini AI** – for AI-driven insights
+- **ZegoCloud** – for video calling
 
-🔧 Project Setup
+---
 
-    Clone the repository:
+## 🛠️ Getting Started
 
-    bash
+### ✅ Prerequisites
 
+Ensure the following are installed on your system:
+
+- **Flutter SDK** (latest stable version recommended)
+- **Dart SDK** (comes with Flutter)
+- **Android Studio** or **VS Code**
+- **Git**
+
+---
+
+## 🔧 Project Setup
+
+### 1. Clone the Repository
+
+```bash
 git clone https://github.com/Manas2k3/gibud-main.git
-
 cd gibud-main
 
-Install dependencies:
-
-bash
+2. Install Dependencies
 
 flutter pub get
 
-Set up Firebase:
+3. Set up Firebase
 
-    Ensure that google-services.json (for Android) and GoogleService-Info.plist (for iOS) are placed in their correct locations inside the android/app and ios/Runner directories, respectively.
+Ensure the following files are placed correctly:
 
-Add upload-keystore.jks:
+    android/app/google-services.json
 
-    Place the upload-keystore.jks file in the following path:
+    ios/Runner/GoogleService-Info.plist
 
-        android/app/upload-keystore.jks
+These files are essential for Firebase integration.
+4. Add Keystore for Android Signing
 
-        Ensure that your key.properties file is correctly configured to reference this keystore.
+Place your keystore file at:
 
+android/app/upload-keystore.jks
+
+Make sure your key.properties file is configured properly to reference this keystore for signed builds.
 ▶️ Run the App
 
-    Use the following command to run the app:
+You can launch the application using:
 
-    bash
+flutter run
 
-    flutter run
-
-    Alternatively, you can use your IDE's built-in run feature.
-
+Or use your preferred IDE’s built-in run button.
 📦 Features
 
-    Firebase Authentication and Firestore
-    OneSignal Push Notifications
-    Razorpay Payments Integration
-    Google Gemini AI API Integration
-    ZegoCloud for Video Calling
-    Role-based User Flow and Dynamic Interfaces
+    ✅ Firebase Authentication & Firestore Database
+
+    🚀 OneSignal Push Notification Integration
+
+    💳 Razorpay Payment Gateway
+
+    🤖 Google Gemini AI Integration
+
+    📹 ZegoCloud for Video/Audio Calls
+
+    🔑 Role-based User Experience with Dynamic Interfaces
