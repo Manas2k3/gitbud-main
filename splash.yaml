@@ -1,0 +1,23 @@
+flutter_native_splash:
+  color: "#FFFFFF"  # White background for all themes
+  color_dark: "#FFFFFF"  # Force white background for dark mode
+  image: assets/images/splashScreenImage/splash.png  # Image for splash screen
+  branding: assets/images/splashScreenImage/banner_image.png  # Branding image for light theme
+  branding_dark: assets/images/splashScreenImage/banner_image.png  # Branding image for dark theme
+  fullscreen: true  # Fullscreen splash
+
+  # Android specific settings
+  android: true
+  android_gravity: center  # Center the image on Android
+
+  android_12:
+    color: "#FFFFFF"  # White background for Android 12 light theme
+    color_dark: "#FFFFFF"  # White background for Android 12 dark theme
+    image: assets/images/splashScreenImage/splash.png
+    branding: assets/images/splashScreenImage/banner_image.png
+    branding_dark: assets/images/splashScreenImage/banner_image.png
+    fullscreen: true
+    icon_background_color: "#FFFFFF"  # White background color for icon
+
+  # Web platform
+  web: false

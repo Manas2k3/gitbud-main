@@ -1,0 +1,2 @@
+D:/gibud/android/app/.cxx/RelWithDebInfo/3x1969k6/x86/CMakeFiles/edit_cache.dir
+D:/gibud/android/app/.cxx/RelWithDebInfo/3x1969k6/x86/CMakeFiles/rebuild_cache.dir
