@@ -1,18 +1,26 @@
-# gibud
+# Gibud
 
-A new Flutter project.
+**Gibud** is a Flutter-based mobile application designed to provide personalized health, wellness, or fitness experiences (customize this line if the app serves a more specific purpose like gut analysis, medical tracking, etc.).
 
-## Getting Started
+The project integrates several key technologies and APIs including Firebase, OneSignal, Razorpay, Gemini AI, and ZegoCloud to deliver a rich, real-time and intelligent user experience.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠️ Getting Started
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Prerequisites
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Flutter SDK (latest stable version recommended)
+- Dart SDK (bundled with Flutter)
+- Android Studio or VS Code
+- Git
 
-# gibud-main
+---
+
+### 🔧 Project Setup
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/Manas2k3/gibud-main.git
+   cd gibud-main
