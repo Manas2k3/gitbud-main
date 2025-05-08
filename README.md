@@ -1,4 +1,4 @@
-# 🌱 Gibud
+#  Gibud
 
 **Gibud** is a Flutter-based mobile application crafted to provide personalized **health, wellness, and fitness** experiences. The app includes intelligent features such as **gut analysis** and **medical tracking**, aiming to help users better understand and improve their well-being.
 
