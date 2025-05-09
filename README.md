@@ -72,4 +72,4 @@ Or use your preferred IDE’s built-in run button.
 
     📹 ZegoCloud for Video/Audio Calls
 
-    🔑 Role-based User Experience with Dynamic Interfaces
+    🔑 Role-based User Experience with Dynamic Interface
