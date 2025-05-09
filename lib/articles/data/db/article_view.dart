@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 
 import 'article.dart'; // for playing videos
 
@@ -16,10 +17,10 @@ class ArticleCard extends StatefulWidget {
 }
 
 class _ArticleCardState extends State<ArticleCard> {
-  bool _isExpanded = true; // Start in expanded state by default
+  bool _isExpanded = true;
 
   @override
-  Widget build(BuildContext  context) {
+  Widget build(BuildContext context) {
     return Card(
       elevation: 4.0,
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
@@ -57,12 +58,12 @@ class _ArticleCardState extends State<ArticleCard> {
                             fontSize: 18.0, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8.0),
                     Text(widget.article.content,
-                        style: GoogleFonts.poppins(fontSize: 16.0,)),
+                        style: GoogleFonts.poppins(fontSize: 16.0)),
                     const SizedBox(height: 8.0),
                     if (widget.article.videoUrl != null)
                       AspectRatio(
                         aspectRatio: 16 / 9,
-                        child: VideoPlayerWidget(videoUrl: widget.article.videoUrl!),
+                        child: ChewieVideoPlayer(videoUrl: widget.article.videoUrl!),
                       ),
                   ],
                 ],
@@ -76,7 +77,7 @@ class _ArticleCardState extends State<ArticleCard> {
 }
 
 class ArticleListPage extends StatelessWidget {
-  final List<Article> articles = articleList; // Your predefined articleList
+  final List<Article> articles = articleList;
 
   @override
   Widget build(BuildContext context) {
@@ -94,38 +95,47 @@ class ArticleListPage extends StatelessWidget {
   }
 }
 
-class VideoPlayerWidget extends StatefulWidget {
+class ChewieVideoPlayer extends StatefulWidget {
   final String videoUrl;
 
-  const VideoPlayerWidget({Key? key, required this.videoUrl}) : super(key: key);
+  const ChewieVideoPlayer({Key? key, required this.videoUrl}) : super(key: key);
 
   @override
-  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+  _ChewieVideoPlayerState createState() => _ChewieVideoPlayerState();
 }
 
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  late VideoPlayerController _controller;
+class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
+  late VideoPlayerController _videoPlayerController;
+  ChewieController? _chewieController;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(widget.videoUrl)
+    _videoPlayerController = VideoPlayerController.network(widget.videoUrl)
       ..initialize().then((_) {
-        setState(() {}); // Refresh the UI once the video is loaded
-        _controller.play(); // Play the video automatically
+        _chewieController = ChewieController(
+          videoPlayerController: _videoPlayerController,
+          autoPlay: false,
+          looping: false,
+          showControls: true,
+          allowMuting: true,
+          allowPlaybackSpeedChanging: true,
+        );
+        setState(() {});
       });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _chewieController?.dispose();
+    _videoPlayerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _controller.value.isInitialized
-        ? VideoPlayer(_controller)
+    return _chewieController != null && _chewieController!.videoPlayerController.value.isInitialized
+        ? Chewie(controller: _chewieController!)
         : Center(child: CircularProgressIndicator());
   }
 }

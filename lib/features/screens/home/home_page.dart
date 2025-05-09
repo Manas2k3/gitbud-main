@@ -332,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   options: CarouselOptions(
-                    height: 390,
+                    height: MediaQuery.of(context).size.height*0.5,
                     autoPlay: true,
                     autoPlayInterval: const Duration(seconds: 4),
                     enlargeCenterPage: true,
