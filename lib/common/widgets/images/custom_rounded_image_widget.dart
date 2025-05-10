@@ -61,7 +61,7 @@ class CustomRoundedImageWidget extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0), // Add padding around the title
                   child: Text(
                     title,
-                    style: TextStyle(color: Colors.grey.shade800, fontSize: 22, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: Colors.grey.shade800, fontSize: 14, fontWeight: FontWeight.bold,),
                   ),
                 ),
               ],
