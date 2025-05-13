@@ -22,7 +22,6 @@ class NavigationMenu extends StatelessWidget {
       Colors.green.shade100,
       Colors.purple.shade100,
       Colors.indigo.shade100,
-      Colors.orange.shade100,
       Colors.red.shade100
     ];
 
@@ -32,7 +31,6 @@ class NavigationMenu extends StatelessWidget {
       Colors.green,
       Colors.purple,
       Colors.indigo,
-      Colors.orange,
       Colors.red
     ];
 
@@ -59,7 +57,7 @@ class NavigationMenu extends StatelessWidget {
               NavigationDestination(icon: Icon(Iconsax.activity), label: "Gut Test"),
               NavigationDestination(icon: Icon(Iconsax.scan), label: "Scanner"),
               NavigationDestination(icon: Icon(Iconsax.shop), label: "Shop"),
-              NavigationDestination(icon: Icon(Icons.child_care), label: "Kids"),
+              // NavigationDestination(icon: Icon(Icons.child_care), label: "Kids"),
               NavigationDestination(icon: Icon(Iconsax.profile_2user), label: "Profile"),
             ],
           ),
@@ -82,7 +80,6 @@ class NavigationController extends GetxController {
     GutTestScreen(),
     Camera(),
     ShopSection(),
-    KidsSection(),
     SettingsScreen()
   ];
 }

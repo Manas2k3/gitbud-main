@@ -24,4 +24,6 @@ class ImageStrings {
   static const gutTestPayment = "assets/images/gut_test_payment.jpg";
 
   static const otpPageImage = "assets/images/Mobile-login.jpg";
+
+  static const kidImage = "assets/images/boy.png";
 }

@@ -307,7 +307,7 @@ class _SurveyReportState extends State<SurveyReport> {
 
   String generatePrompt(Map<String, String> riskLevels) {
     String prompt =
-        "Provide health suggestions based on these gut health risk levels points wise with numbers beside it:\n";
+        "Provide 5 short and effective health suggestions based on different gut health risk levels, listed point-wise with numbers (1 to 5). Do not exceed 5 points. :\n";
 
     riskLevels.forEach((category, risk) {
       prompt += "$category: $risk\n";
@@ -326,13 +326,13 @@ class _SurveyReportState extends State<SurveyReport> {
     }
 
     prompt +=
-        "Avoid using HashTags at the beginning while getting the response. List out the key components that a gut health report should include to make it appealing and valuable for the customer. Use bullet points, and make sure to emphasize key terms in bold text. Include suggestions like natural Indian remedies to reduce cravings for alcohol or tobacco. Also, specify vitamins crucial for gut health and recommend foods to help with these deficiencies. Keep it informative and structured. also, at the end do put a disclaimer that report is not a substitute for the professional medical advice and do consult to someone professional";
+        "List the key components that should be included in a gut health report to make it informative and appealing to customers. Use bullet points and highlight important terms in bold. Include short, effective suggestions such as natural Indian remedies to reduce alcohol or tobacco cravings. Mention essential vitamins for gut health and recommend foods that help correct these deficiencies. Ensure the content is well-structured and informative. At the end, include a short disclaimer stating the report is not a substitute for professional medical advice and that consultation with a healthcare expert is recommended.";
 
     return prompt;
   }
 
   Future<String?> getGeminiResponse(String prompt) async {
-    final apiKey = dotenv.env['GEMINI_API_KEY'];
+    final apiKey = GEMINI_API_KEY;
 
     if (apiKey == null || apiKey.isEmpty) {
       throw Exception("GEMINI_API_KEY is not set in the .env file");
