@@ -1,115 +1,109 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax/iconsax.dart';
+
 import 'package:gibud/common/components/widgets/custom_shapes/containers/primary_header_container.dart';
 import 'package:gibud/common/widgets/appbar/appbar.dart';
 import 'package:gibud/navigation_menu.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:gibud/survey/survey_report.dart';
 
 import '../data/repositories/survey/survey_questions.dart';
 import '../data/repositories/survey/survey_suggestions.dart';
 import 'model/survey_model.dart';
 
+int _getMarksFromResponse(SurveyQuestion question, String responseKey) {
+  final keys = question.responses.keys.toList();
+  final index = keys.indexOf(responseKey.trim());
+  return index != -1 ? index + 1 : 0;
+}
+
 class SurveyResultScreen extends StatelessWidget {
   final Map<int, String> responses;
-  final int totalScore;
+  final int calculatedTotalScore;
   final String? surveyCategory;
   final String? riskLevel;
 
   const SurveyResultScreen({
     required this.responses,
-    required this.totalScore,
+    required this.calculatedTotalScore,
     this.surveyCategory,
     this.riskLevel,
+    Key? key,
     required resultCategory,
-  });
+  }) : super(key: key);
 
   String _getSeverity(int score) {
-    if (score <= 20) {
-      return "Your responses indicate that you have a Low Risk for digestive issues";
-    } else if (score >= 21 && score <= 35) {
-      return "Your responses indicate that you have a Moderate Risk for digestive issues";
-    } else if (score >= 36 && score <= 39) {
-      return "Your responses indicate that you have a High Risk for digestive issues";
-    } else {
-      return "Your responses indicate that you have a Very High Risk for digestive issues";
-    }
+    if (score <= 20) return "Your responses indicate that you have a Low Risk for digestive issues";
+    if (score <= 35) return "Your responses indicate that you have a Moderate Risk for digestive issues";
+    if (score <= 39) return "Your responses indicate that you have a High Risk for digestive issues";
+    return "Your responses indicate that you have a Very High Risk for digestive issues";
   }
 
   Color _getSeverityColor(int score) {
-    if (score <= 20) {
-      return Colors.green;
-    } else if (score >= 21 && score <= 35) {
-      return Colors.amber;
-    } else if (score >= 36 && score <= 39) {
-      return Colors.orange;
-    } else {
-      return Colors.red;
-    }
+    if (score <= 20) return Colors.green;
+    if (score <= 35) return Colors.amber;
+    if (score <= 39) return Colors.orange;
+    return Colors.red;
   }
 
   Map<String, String> _buildRiskLevels() {
-    Map<String, String> riskLevels = {
-      "Tobacco Use": "Not At Risk",
-      "Alcohol Use": "Not At Risk",
-      "Anxiety, depression": "Not At Risk",
-      "Family History": "Not At Risk",
-      "Bloating": "Not At Risk",
-      "Constipation": "Not At Risk",
-      "Physical Activity": "Not At Risk",
-      "Environmental Stress": "Not At Risk",
-      "Fever, nausea": "Not At Risk",
-      "Stress Levels": "Not At Risk",
-      "Medication Stress": "Not At Risk",
-      "Digestive Issues": "Not At Risk",
+    final Map<String, String> riskLevels = {
+      for (var q in surveyQuestions) q.resultCategory: "Not At Risk"
     };
 
     responses.forEach((index, response) {
-      SurveyQuestion question = surveyQuestions[index];
-      int score = question.responses.indexOf(response) + 1;
-      String riskLevelDescription;
+      final question = surveyQuestions[index];
+      final score = _getMarksFromResponse(question, response);
 
-      if (totalScore <= 20) {
-        riskLevelDescription = "Low Risk";
-      } else if (totalScore >= 21 && totalScore <= 35) {
-        riskLevelDescription = "Moderate Risk";
-      } else if (totalScore >= 36 && totalScore <= 39) {
-        riskLevelDescription = "High Risk";
-      } else {
-        riskLevelDescription = "Very High Risk";
+      if (score >= 1) {
+        riskLevels[question.resultCategory] = switch (score) {
+          1 => "Low Risk",
+          2 => "Moderate Risk",
+          3 => "High Risk",
+          4 => "Very High Risk",
+          _ => "Not At Risk",
+        };
       }
-
-      riskLevels[question.resultCategory] = riskLevelDescription;
     });
 
     return riskLevels;
   }
 
+
   @override
   Widget build(BuildContext context) {
-    String severity = _getSeverity(totalScore);
-    Color severityColor = _getSeverityColor(totalScore);
-    Map<String, String> riskLevels = _buildRiskLevels();
+    final calculatedTotalScore = responses.entries.fold<int>(0, (sum, entry) {
+      final question = surveyQuestions[entry.key];
+      final score = _getMarksFromResponse(question, entry.value);
+      return sum + score;
+    });
 
-    List<Map<String, dynamic>> questionDetails = [];
-    for (var index = 0; index < surveyQuestions.length; index++) {
-      SurveyQuestion question = surveyQuestions[index];
-      String response = responses[index] ?? "No response";
-      int score = question.responses.indexOf(response) + 1;
-      String riskLevel = riskLevels[question.resultCategory] ?? "Not At Risk";
-      questionDetails.add({
-        'question': question.question,
-        'response': response,
-        'score': score,
-        'riskLevel': riskLevel,
-      });
-    }
+    final severity = _getSeverity(calculatedTotalScore);
+    final severityColor = _getSeverityColor(calculatedTotalScore);
+    final riskLevels = _buildRiskLevels();
+
+    final questionDetails = List<Map<String, dynamic>>.generate(
+      surveyQuestions.length,
+          (index) {
+        final question = surveyQuestions[index];
+        final response = responses[index] ?? "No response";
+        final score = _getMarksFromResponse(question, response);
+        final risk = riskLevels[question.resultCategory] ?? "Not At Risk";
+
+        return {
+          'question': question.question,
+          'response': response,
+          'score': score,
+          'riskLevel': risk,
+        };
+      },
+    );
 
     return WillPopScope(
       onWillPop: () async {
-        Get.offAll(NavigationMenu());
-        return false; // Prevent default back button behavior
+        Get.offAll(() => const NavigationMenu());
+        return false;
       },
       child: Scaffold(
         backgroundColor: Colors.green.shade100,
@@ -121,9 +115,7 @@ class SurveyResultScreen extends StatelessWidget {
                 children: [
                   CustomAppBar(
                     showBackArrow: true,
-                    leadingOnPressed: () {
-                      Get.offAll(NavigationMenu());
-                    },
+                    leadingOnPressed: () => Get.offAll(() => const NavigationMenu()),
                     leadingIcon: Iconsax.arrow_left,
                     title: Text(
                       "SURVEY RESULT",
@@ -140,32 +132,28 @@ class SurveyResultScreen extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
+                padding: const EdgeInsets.all(8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Total Score: $totalScore',
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
+                    Text('Total Score: $calculatedTotalScore',
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
                     const SizedBox(height: 5),
-                    Text(
-                      severity,
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: severityColor,
-                      ),
-                    ),
+                    Text(severity,
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: severityColor,
+                        )),
+                    const SizedBox(height: 8),
                     Expanded(
                       child: ListView.builder(
                         itemCount: surveyQuestions.length,
                         itemBuilder: (context, index) {
-                          SurveyQuestion question = surveyQuestions[index];
-                          String response = responses[index] ?? "N/A";
-                          int score = question.responses.indexOf(response) + 1;
-      
+                          final question = surveyQuestions[index];
+                          final response = responses[index] ?? "N/A";
+                          final score = _getMarksFromResponse(question, response);
+
                           return ResponseBox(
                             questionNumber: index + 1,
                             question: question.question,
@@ -185,20 +173,16 @@ class SurveyResultScreen extends StatelessWidget {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Get.to(() => SurveyReport(
-                  riskLevels: riskLevels,
-                  responses: responses,
-                  totalScore: totalScore,
+              riskLevels: riskLevels,
+              responses: responses,
+              totalScore: calculatedTotalScore,
               questionDetails: questionDetails,
-                ));
+            ));
           },
-          label: const Text(
-            "Get a detailed report",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+          label: const Text("Get a detailed report", style: TextStyle(fontWeight: FontWeight.bold)),
           icon: const Icon(Icons.description),
           backgroundColor: Colors.greenAccent,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
@@ -212,53 +196,40 @@ class ResponseBox extends StatelessWidget {
   final String? riskLevel;
 
   const ResponseBox({
-    Key? key,
     required this.questionNumber,
     required this.question,
     required this.response,
     required this.score,
     this.riskLevel,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Color boxColor;
-    String riskLevelDescription = riskLevel ?? "N/A";
-    String suggestion = "No suggestion available";
+    final riskDescription = riskLevel ?? "N/A";
 
-    switch (score) {
-      case 1:
-        boxColor = Colors.green;
-        riskLevelDescription = "Low Risk";
-        break;
-      case 2:
-        boxColor = Colors.amber;
-        riskLevelDescription = "Moderate Risk";
-        break;
-      case 3:
-        boxColor = Colors.orange;
-        riskLevelDescription = "High Risk";
-        break;
-      case 4:
-        boxColor = Colors.red;
-        riskLevelDescription = "Very High Risk";
-        break;
-      default:
-        boxColor = Colors.grey;
-        riskLevelDescription = "N/A";
-    }
+    final List<Color> severityColors = [
+      Colors.green,
+      Colors.amber,
+      Colors.orange,
+      Colors.red,
+    ];
+
+    final boxColor = (score >= 1 && score <= severityColors.length)
+        ? severityColors[score - 1]
+        : Colors.grey;
+
 
     final surveyQuestion = surveySuggestions[questionNumber - 1];
     final responseSuggestion = surveyQuestion['responses'].firstWhere(
-      (resp) => resp['response'] == response,
+          (resp) => resp['response'] == response,
       orElse: () => {'suggestion': 'No suggestion available'},
     );
-    suggestion = responseSuggestion['suggestion'];
-
-    bool showSuggestion = riskLevelDescription != "Low Risk";
+    final suggestion = responseSuggestion['suggestion'];
+    final showSuggestion = riskDescription != "Low Risk";
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -267,68 +238,15 @@ class ResponseBox extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Q$questionNumber: $question",
-              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-            ),
+            Text("Q$questionNumber: $question", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(
-              "Your answer: $response",
-              style: GoogleFonts.poppins(),
-            ),
+            Text("Your answer: $response", style: GoogleFonts.poppins()),
             const SizedBox(height: 4),
             Row(
               children: [
                 Text(
-                  riskLevelDescription,
-                  style:
-                      TextStyle(color: boxColor, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 100),
-                Visibility(
-                  visible: showSuggestion,
-                  child: GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text("Suggestion"),
-                            content: Text(suggestion),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Get.back(),
-                                child: const Text("Close"),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: Container(
-                      height: 40,
-                      width: 120,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: boxColor,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.lightbulb_outline,
-                              color: Colors.white, size: 24),
-                          const SizedBox(width: 8),
-                          Text(
-                            "Suggestion",
-                            style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  riskDescription,
+                  style: TextStyle(color: boxColor, fontWeight: FontWeight.bold),
                 ),
               ],
             ),

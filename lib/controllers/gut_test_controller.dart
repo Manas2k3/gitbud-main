@@ -75,7 +75,7 @@ class GutTestController extends GetxController {
         // Fallback in case context is null
         Get.off(() => SurveyResultScreen(
           responses: selectedResponses,
-          totalScore: surveyController.totalScore.value,
+          calculatedTotalScore: surveyController.totalScore.value,
           resultCategory: null,
         ));
       }
@@ -134,7 +134,7 @@ class GutTestController extends GetxController {
 
         Get.to(SurveyResultScreen(
           responses: selectedResponses,
-          totalScore: surveyController.totalScore.value,
+          calculatedTotalScore: surveyController.totalScore.value,
           resultCategory: null,
         ));
       } else {

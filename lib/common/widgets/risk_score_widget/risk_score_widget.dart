@@ -4,28 +4,34 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class RiskScoreWidget extends StatelessWidget {
   final int score;
-  final String riskLevel;
-  final String riskExplanation;
 
-  RiskScoreWidget({
-    required this.score,
-    required this.riskLevel,
-    required this.riskExplanation,
-  });
+  RiskScoreWidget({required this.score, required String riskLevel, required String riskExplanation});
 
   @override
   Widget build(BuildContext context) {
-    Color riskColor;
+    // Clamp score to valid range
+    final clampedScore = score.clamp(0, 4);
 
-    // Set color based on score ranges
-    if (score == 1) {
+    Color riskColor;
+    String riskLevel;
+    String riskExplanation;
+
+    if (clampedScore == 0) {
       riskColor = Colors.green;
-    } else if (score == 2) {
+      riskLevel = 'Low';
+      riskExplanation = 'You have a low risk. Keep up the healthy habits!';
+    } else if (clampedScore == 1) {
       riskColor = Colors.amber;
-    } else if (score == 3) {
+      riskLevel = 'Moderate';
+      riskExplanation = 'Your risk is moderate. Consider mild lifestyle changes.';
+    } else if (clampedScore == 2) {
       riskColor = Colors.orange;
+      riskLevel = 'High';
+      riskExplanation = 'High risk detected. A doctor consultation is advised.';
     } else {
       riskColor = Colors.red;
+      riskLevel = 'Very High';
+      riskExplanation = 'Very high risk. Seek immediate medical attention.';
     }
 
     return Container(
@@ -47,41 +53,39 @@ class RiskScoreWidget extends StatelessWidget {
           Text(
             "Lung Health Risk Score",
             style: GoogleFonts.poppins(
-                color: Colors.black, fontSize: 14, fontWeight: FontWeight.w600),
+              color: Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           SizedBox(
-            width: 250, // Adjust the width as needed
-            height: 250, // Adjust the height as needed
+            width: 250,
+            height: 250,
             child: SfRadialGauge(
               axes: <RadialAxis>[
                 RadialAxis(
                   minimum: 0,
                   maximum: 4,
-                  // Set maximum score to 4
                   interval: 1,
                   ranges: <GaugeRange>[
                     GaugeRange(startValue: 0, endValue: 1, color: Colors.green),
                     GaugeRange(startValue: 1, endValue: 2, color: Colors.amber),
-                    GaugeRange(
-                        startValue: 2, endValue: 3, color: Colors.orange),
+                    GaugeRange(startValue: 2, endValue: 3, color: Colors.orange),
                     GaugeRange(startValue: 3, endValue: 4, color: Colors.red),
                   ],
                   pointers: <GaugePointer>[
-                    NeedlePointer(value: score.toDouble()),
+                    NeedlePointer(value: clampedScore.toDouble()),
                   ],
                 ),
               ],
             ),
           ),
           const SizedBox(height: 30),
-          // Score Display
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildScoreColumn(
-                  Icons.speed, 'SCORE', score.toString(), riskColor),
-              _buildRiskColumn(
-                  Icons.warning, riskLevel, riskExplanation, riskColor),
+              _buildScoreColumn(Icons.speed, 'SCORE', clampedScore.toString(), riskColor),
+              _buildRiskColumn(Icons.warning, riskLevel, riskExplanation, riskColor),
             ],
           ),
         ],
@@ -89,9 +93,7 @@ class RiskScoreWidget extends StatelessWidget {
     );
   }
 
-  // Helper method to build the score column
-  Column _buildScoreColumn(
-      IconData icon, String title, String value, Color color) {
+  Column _buildScoreColumn(IconData icon, String title, String value, Color color) {
     return Column(
       children: [
         Padding(
@@ -121,9 +123,7 @@ class RiskScoreWidget extends StatelessWidget {
     );
   }
 
-  // Helper method to build the risk column
-  Column _buildRiskColumn(
-      IconData icon, String riskLevel, String explanation, Color riskColor) {
+  Column _buildRiskColumn(IconData icon, String riskLevel, String explanation, Color riskColor) {
     return Column(
       children: [
         Icon(icon, size: 50, color: riskColor),
@@ -139,14 +139,6 @@ class RiskScoreWidget extends StatelessWidget {
             color: riskColor,
             fontWeight: FontWeight.bold,
           ),
-        ),
-        Text(
-          explanation,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.grey[700],
-              fontWeight: FontWeight.w600),
         ),
       ],
     );

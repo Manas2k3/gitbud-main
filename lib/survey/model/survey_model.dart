@@ -1,6 +1,6 @@
 class SurveyQuestion {
   final String question;
-  final List<String> responses;
+  final Map<String, String> responses;
   final String resultCategory;
   final int stringResourceId;
 

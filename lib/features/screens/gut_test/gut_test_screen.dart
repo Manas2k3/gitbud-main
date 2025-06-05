@@ -106,11 +106,9 @@ class GutTestScreen extends StatelessWidget {
                   Column(
                     children: [
                       Text(
-                        "1. Answer each question as honestly and accurately as possible.\n"
-                            "2. Your privacy is our utmost priority; all responses provided in this "
-                            "questionnaire are strictly confidential.\n"
-                            "3. While this questionnaire provides insights into your gut health, it is "
-                            "not a substitute for professional medical advice.\n",
+                        "1. Please answer each question honestly and accurately.\n"
+                            "2. Your responses are completely confidential.\n"
+                            "3. This survey offers insight into your gut health but is not a replacement for professional medical advice.",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -119,8 +117,7 @@ class GutTestScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "Note: If you have specific concerns about your gut health or any medical "
-                            "conditions, please consult a healthcare professional.",
+                        "Note: For specific concerns about your gut health or medical conditions, consult a healthcare professional.",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -129,6 +126,7 @@ class GutTestScreen extends StatelessWidget {
                         ),
                       ),
                     ],
+
                   ),
                   const SizedBox(height: 32),
 

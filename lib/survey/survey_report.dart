@@ -381,10 +381,26 @@ class _SurveyReportState extends State<SurveyReport> {
       "Digestive Issues": "Not At Risk",
     };
 
+
+
     widget.responses.forEach((index, response) {
+      int _getMarksFromResponse(SurveyQuestion question, String responseKey) {
+        final keys = question.responses.keys.toList();
+        final index = keys.indexOf(responseKey.trim());
+        return index != -1 ? index : -1;
+      }
+
       SurveyQuestion question = surveyQuestions[index];
 
-      int score = question.responses.indexOf(response) + 1;
+      // response is the selected response string
+      var score = _getMarksFromResponse(question, response);
+
+
+      if (score == -1) {
+        // handle response not found case
+      } else {
+        score = score + 1; // if you want to add 1 as before
+      }
 
       String riskLevelDescription;
 

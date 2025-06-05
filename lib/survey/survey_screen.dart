@@ -36,7 +36,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
 
   Future<void> _fetchUserGender() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = FirebaseAuth.instance.currentUser ;
       if (user != null) {
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('Users') // Updated to fetch from 'Users' collection
@@ -88,6 +88,18 @@ class _SurveyScreenState extends State<SurveyScreen> {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                "Answer each question on a scale of 0–3, where 0 refers to no issue and 3 refers to severe impact..",
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[800],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
             Expanded(
               child: gender == null
                   ? Center(child: CircularProgressIndicator()) // Show loading indicator while gender is being fetched
@@ -108,12 +120,32 @@ class _SurveyScreenState extends State<SurveyScreen> {
           padding: const EdgeInsets.all(16.0),
           child: CustomButton(
             buttonText: 'Submit',
-            onTap: () => _submitSurvey(context), initialColor: Colors.green, pressedColor: Colors.green.shade100,
+            onTap: () => _submitSurvey(context),
+            initialColor: Colors.green,
+            pressedColor: Colors.green.shade100,
           ),
         ),
       ),
     );
   }
+
+  int _getMarksFromResponse(String responseKey) {
+    // Customize this mapping logic to suit your scoring system
+    switch (responseKey) {
+      case "0":
+        return 0;
+      case "1":
+      case "1 to 2":
+        return 1;
+      case "3 to 5":
+        return 2;
+      case "6 to 10":
+        return 3;
+      default:
+        return 0;
+    }
+  }
+
 
   Widget _buildQuestionCard(SurveyQuestion question, int index) {
     return Card(
@@ -130,23 +162,25 @@ class _SurveyScreenState extends State<SurveyScreen> {
             ),
             SizedBox(height: 10),
             Column(
-              children: question.responses.map((response) {
+              children: question.responses.entries.map((entry) {
+                String responseKey = entry.key;
+                String responseValue = entry.value;
+
                 return RadioListTile<String>(
                   activeColor: Colors.green,
-                  title: Text(response),
-                  value: response,
+                  title: Text(responseKey),
+                  value: responseKey,
                   groupValue: selectedResponses[index],
                   onChanged: (value) {
                     setState(() {
                       selectedResponses[index] = value!;
-                      surveyController.selectAnswer(
-                        index,
-                        question.responses.indexOf(value),
-                        question,
-                      );
+                      // Assign a score based on your own logic
+                      int marks = _getMarksFromResponse(responseKey);
+                      surveyController.selectAnswer(index, marks, question);
                     });
                   },
                 );
+
               }).toList(),
             ),
           ],
@@ -154,6 +188,8 @@ class _SurveyScreenState extends State<SurveyScreen> {
       ),
     );
   }
+
+
   Future<void> _submitSurvey(BuildContext context) async {
     try {
       FullScreenLoader.openLoadingDialog(
@@ -175,7 +211,6 @@ class _SurveyScreenState extends State<SurveyScreen> {
       if (selectedResponses.length == requiredResponsesCount) {
         await surveyController.submitSurvey(context);
 
-        // 🔽 Bypass payment logic: Directly navigate to SurveyResultScreen
         FullScreenLoader.stopLoading();
         Loaders.successSnackBar(
           title: 'Response Recorded',
@@ -184,44 +219,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
 
         Get.to(SurveyResultScreen(
           responses: selectedResponses,
-          totalScore: surveyController.totalScore.value,
+          calculatedTotalScore: surveyController.totalScore.value,
           resultCategory: null,
         ));
-
-        // 🔒 Commented for future re-implementation of payment check:
-        /*
-      String userId = FirebaseAuth.instance.currentUser!.uid;
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(userId)
-          .get();
-
-      if (userDoc.exists) {
-        bool paymentStatus = userDoc['gutTestPaymentStatus'] ?? false;
-
-        if (paymentStatus) {
-          FullScreenLoader.stopLoading();
-          Loaders.successSnackBar(
-            title: 'Response Recorded',
-            message: 'Your responses have been recorded successfully!',
-          );
-
-          Get.to(SurveyResultScreen(
-            responses: selectedResponses,
-            totalScore: surveyController.totalScore.value,
-            resultCategory: null,
-          ));
-        } else {
-          Get.to(() => PaymentsPage(
-            selectedResponses: selectedResponses,
-            gender: gender,
-          ));
-        }
-      } else {
-        FullScreenLoader.stopLoading();
-        Get.snackbar("Error", "User data not found. Please try again.");
-      }
-      */
       } else {
         FullScreenLoader.stopLoading();
         Loaders.warningSnackBar(
@@ -238,8 +238,6 @@ class _SurveyScreenState extends State<SurveyScreen> {
       );
     }
   }
-
-
 
   void _showNoInternetDialog(BuildContext context) {
     showDialog(
