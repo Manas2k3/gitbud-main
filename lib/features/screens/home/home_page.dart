@@ -96,6 +96,11 @@ class _HomePageState extends State<HomePage> {
       'image': ImageStrings.kidImage,
       'navigateTo': KidsSection(),
     },
+    {
+      'title': 'Discover Personalized Nutrition \nInsights From Your Plate',
+      'image': ImageStrings.kidImage,
+      'navigateTo': KidsSection(),
+    },
   ];
 
   final FirebaseAuth _auth = FirebaseAuth.instance;

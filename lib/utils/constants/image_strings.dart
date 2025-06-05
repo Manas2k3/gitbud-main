@@ -26,4 +26,6 @@ class ImageStrings {
   static const otpPageImage = "assets/images/Mobile-login.jpg";
 
   static const kidImage = "assets/images/boy.png";
+
+  static const foodSwapImage = "assets/images/food_swap_image.jpg";
 }
