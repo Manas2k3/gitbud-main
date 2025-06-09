@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gibud/features/screens/food_swap/food_swap_image_upload_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -98,8 +99,8 @@ class _HomePageState extends State<HomePage> {
     },
     {
       'title': 'Discover Personalized Nutrition \nInsights From Your Plate',
-      'image': ImageStrings.kidImage,
-      'navigateTo': KidsSection(),
+      'image': ImageStrings.foodSwapImage,
+      'navigateTo': FoodSwapImageUploadPage(),
     },
   ];
 
