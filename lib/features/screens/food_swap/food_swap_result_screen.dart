@@ -1,193 +1,152 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'dart:convert';
 
-class FoodSwapImageUploadPage extends StatefulWidget {
-  const FoodSwapImageUploadPage({super.key});
+class FoodSwapResultsPage extends StatelessWidget {
+  final String predictedFood;
+  final Map<String, dynamic> nutritionInfo;
+  final List<dynamic> alternatives;
 
-  @override
-  State<FoodSwapImageUploadPage> createState() =>
-      _FoodSwapImageUploadPageState();
-}
-
-class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
-  File? _selectedImage;
-  final ImagePicker _picker = ImagePicker();
-
-  Future<void> _pickImage(ImageSource source) async {
-    final pickedFile =
-    await _picker.pickImage(source: source, imageQuality: 80);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-      await sendImageToAPI(_selectedImage!); // 👈 send after picking
-    }
-  }
-
-  Future<void> sendImageToAPI(File imageFile) async {
-    final uri = Uri.parse("https://food-swap.onrender.com/predict");
-
-    try {
-      final request = http.MultipartRequest("POST", uri)
-        ..files.add(await http.MultipartFile.fromPath(
-          'image',
-          imageFile.path,
-          contentType: MediaType('image', 'jpeg'),
-        ));
-
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
-        final resBody = await response.stream.bytesToString();
-        final jsonData = jsonDecode(resBody);
-
-        // Example: print response
-        print("✅ Prediction: ${jsonData['predicted_food']}");
-        print("🍽️ Nutrition: ${jsonData['nutritional_info']}");
-        print("🔁 Alternatives: ${jsonData['alternatives']}");
-
-        // You can use setState to pass the data into the UI
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Prediction: ${jsonData['predicted_food']}')),
-        );
-
-        // TODO: Navigate or show detailed results page
-      } else {
-        print("❌ Failed with status: ${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Upload failed')),
-        );
-      }
-    } catch (e) {
-      print("❌ Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error occurred: $e')),
-      );
-    }
-  }
+  const FoodSwapResultsPage({
+    super.key,
+    required this.predictedFood,
+    required this.nutritionInfo,
+    required this.alternatives,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          "Food Swap",
+          'Swap Suggestions',
           style: GoogleFonts.poppins(
-            fontSize: 20,
             fontWeight: FontWeight.w600,
+            fontSize: 20,
             color: Colors.black,
           ),
         ),
+        centerTitle: true,
+        leading: const BackButton(color: Colors.black),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: const BackButton(color: Colors.black),
-        centerTitle: true,
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      backgroundColor: Colors.white,
+      body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Text(
-              "Take a photo or upload an image of your meal",
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
+          Text(
+            'Scanned Meal',
+            style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
+          _buildMealCard(
+            title: predictedFood,
+            calories: nutritionInfo['Calories'].toString(),
+            imageUrl: alternatives.isNotEmpty ? alternatives[0]['image'] : '', // fallback to alt image
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Healthier Swaps',
+            style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          ...alternatives.map((alt) => _buildSwapCard(alt)).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMealCard({
+    required String title,
+    required String calories,
+    required String imageUrl,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('1 serving', style: GoogleFonts.poppins(fontSize: 12)),
+              const SizedBox(height: 4),
+              Text(title,
+                  style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+              Text('$calories calories', style: GoogleFonts.poppins(fontSize: 14)),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: imageUrl.isNotEmpty
+              ? Image.network(imageUrl, height: 64, width: 64, fit: BoxFit.cover)
+              : Container(
+            height: 64,
+            width: 64,
+            color: Colors.grey[300],
+            child: const Icon(Icons.image, color: Colors.black26),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSwapCard(Map<String, dynamic> swap) {
+    final nutrition = swap['nutritional_info'] ?? {};
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Text Part
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: _selectedImage != null
-                    ? ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.file(
-                    _selectedImage!,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                  ),
-                )
-                    : const Center(
-                  child: Icon(
-                    Icons.image,
-                    size: 80,
-                    color: Colors.black26,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: TextButton(
-                    onPressed: () => _pickImage(ImageSource.camera),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: Text(
-                      "Take a photo",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                Text('1 serving', style: GoogleFonts.poppins(fontSize: 12)),
+                const SizedBox(height: 4),
+                Text(
+                  swap['name'] ?? 'Alternative Food',
+                  style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: OutlinedButton(
-                    onPressed: () => _pickImage(ImageSource.gallery),
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF7F3F3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      side: BorderSide.none,
-                    ),
-                    child: Text(
-                      "Upload an image",
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
+                Text('${nutrition['Calories'] ?? 'N/A'} calories',
+                    style: GoogleFonts.poppins(fontSize: 14)),
+                const SizedBox(height: 4),
+                Text(
+                  _buildDescription(nutrition),
+                  style: GoogleFonts.poppins(fontSize: 13),
                 ),
               ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              swap['image'],
+              height: 64,
+              width: 64,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                height: 64,
+                width: 64,
+                color: Colors.grey[300],
+                child: const Icon(Icons.image, color: Colors.black26),
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _buildDescription(Map<String, dynamic> info) {
+    final carbs = info['Carbohydrates'] ?? 'N/A';
+    final protein = info['Protein'] ?? 'N/A';
+    final fat = info['Total Fat'] ?? 'N/A';
+    final sugar = info['Sugars'] ?? 'N/A';
+
+    return 'Carbs: $carbs, Protein: $protein, Fat: $fat, Sugar: $sugar';
   }
 }

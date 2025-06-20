@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gibud/features/screens/food_swap/food_swap_result_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 class FoodSwapImageUploadPage extends StatefulWidget {
   const FoodSwapImageUploadPage({super.key});
@@ -21,6 +25,47 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
       setState(() {
         _selectedImage = File(pickedFile.path);
       });
+    }
+  }
+
+  Future<void> sendImageToAPI(BuildContext context, File imageFile) async {
+    final uri = Uri.parse("https://food-swap.onrender.com/predict");
+
+    try {
+      final request = http.MultipartRequest("POST", uri)
+        ..files.add(await http.MultipartFile.fromPath(
+          'image',
+          imageFile.path,
+          contentType: MediaType('image', 'jpeg'),
+        ));
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final resBody = await response.stream.bytesToString();
+        final jsonData = jsonDecode(resBody);
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => FoodSwapResultsPage(
+              predictedFood: jsonData['predicted_food'],
+              nutritionInfo: Map<String, dynamic>.from(jsonData['nutritional_info']),
+              alternatives: List<dynamic>.from(jsonData['alternatives']),
+            ),
+          ),
+        );
+      } else {
+        print("❌ Failed with status: ${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Upload failed')),
+        );
+      }
+    } catch (e) {
+      print("❌ Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error occurred: $e')),
+      );
     }
   }
 
@@ -46,8 +91,6 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const SizedBox(height: 24),
-
-          // Text prompt
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Text(
@@ -59,10 +102,7 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
               textAlign: TextAlign.center,
             ),
           ),
-
           const SizedBox(height: 20),
-
-          // Image Preview
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -91,10 +131,7 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
               ),
             ),
           ),
-
           const SizedBox(height: 24),
-
-          // Buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
             child: Column(
@@ -103,7 +140,9 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton(
-                    onPressed: () => _pickImage(ImageSource.camera),
+                    onPressed: () async {
+                      await _pickImage(ImageSource.camera);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
@@ -125,9 +164,11 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
                   width: double.infinity,
                   height: 52,
                   child: OutlinedButton(
-                    onPressed: () => _pickImage(ImageSource.gallery),
+                    onPressed: () async {
+                      await _pickImage(ImageSource.gallery);
+                    },
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: Color(0xFFF7F3F3),
+                      backgroundColor: const Color(0xFFF7F3F3),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -139,6 +180,36 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_selectedImage != null) {
+                        sendImageToAPI(context, _selectedImage!);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Please select an image first.")),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text(
+                      "Analyze Meal",
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
                   ),
