@@ -141,7 +141,7 @@ class _SignupPageState extends State<SignupPage> {
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(15),
-                                      borderSide: BorderSide(color: Colors.blue),
+                                      borderSide: BorderSide(color: Colors.black),
                                     ),
                                     labelText: 'Phone Number',
                                   ),

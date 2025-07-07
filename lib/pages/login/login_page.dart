@@ -70,6 +70,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     // Phone Number Field
                     TextFormField(
+                      cursorColor: Colors.black,
                       controller: controller.emailController,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Iconsax.message),

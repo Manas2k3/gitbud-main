@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -5,12 +6,14 @@ class FoodSwapResultsPage extends StatelessWidget {
   final String predictedFood;
   final Map<String, dynamic> nutritionInfo;
   final List<dynamic> alternatives;
+  final File scannedImage;
 
   const FoodSwapResultsPage({
     super.key,
     required this.predictedFood,
     required this.nutritionInfo,
     required this.alternatives,
+    required this.scannedImage,
   });
 
   @override
@@ -42,7 +45,7 @@ class FoodSwapResultsPage extends StatelessWidget {
           _buildMealCard(
             title: predictedFood,
             calories: nutritionInfo['Calories'].toString(),
-            imageUrl: alternatives.isNotEmpty ? alternatives[0]['image'] : '', // fallback to alt image
+            scannedImage: scannedImage,
           ),
           const SizedBox(height: 24),
           Text(
@@ -59,7 +62,7 @@ class FoodSwapResultsPage extends StatelessWidget {
   Widget _buildMealCard({
     required String title,
     required String calories,
-    required String imageUrl,
+    required File scannedImage,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,13 +82,11 @@ class FoodSwapResultsPage extends StatelessWidget {
         const SizedBox(width: 12),
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: imageUrl.isNotEmpty
-              ? Image.network(imageUrl, height: 64, width: 64, fit: BoxFit.cover)
-              : Container(
-            height: 64,
-            width: 64,
-            color: Colors.grey[300],
-            child: const Icon(Icons.image, color: Colors.black26),
+          child: Image.file(
+            scannedImage,
+            height: 80,
+            width: 180,
+            fit: BoxFit.cover,
           ),
         ),
       ],
@@ -125,8 +126,8 @@ class FoodSwapResultsPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
               swap['image'],
-              height: 64,
-              width: 64,
+              height: 80,
+              width: 180,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => Container(
                 height: 64,
@@ -144,7 +145,7 @@ class FoodSwapResultsPage extends StatelessWidget {
   String _buildDescription(Map<String, dynamic> info) {
     final carbs = info['Carbohydrates'] ?? 'N/A';
     final protein = info['Protein'] ?? 'N/A';
-    final fat = info['Total Fat'] ?? 'N/A';
+    final fat = info['Fats']?['Total'] ?? 'N/A';
     final sugar = info['Sugars'] ?? 'N/A';
 
     return 'Carbs: $carbs, Protein: $protein, Fat: $fat, Sugar: $sugar';

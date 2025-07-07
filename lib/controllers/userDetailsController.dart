@@ -10,7 +10,9 @@ import 'package:gibud/utils/constants/animation_strings.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
+import '../data/repositories/authentication/authentication_repository.dart';
 import '../data/repositories/user/user_repository.dart';
+import '../pages/signup/widgets/verify_mail.dart';
 import '../utils/popups/full_screen.dart';
 import '../utils/popups/loaders.dart';
 import '../utils/storage/user_model.dart';
@@ -58,26 +60,30 @@ class Userdetailscontroller extends GetxController {
         return;
       }
 
-      // Validate the form
+      // Validate form
       if (!userDetailFormKey.currentState!.validate()) {
         FullScreenLoader.stopLoading();
         return;
       }
 
-      // Create user with email and password
-      final userCredential = await _auth.createUserWithEmailAndPassword(
+      // Create user account
+      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email.text.trim(),
         password: password.text.trim(),
       );
 
-      final User? user = userCredential.user;
+      final user = userCredential.user;
+
       if (user != null) {
+        // Send email verification
+        await AuthenticationRepository.instance.sendEmailVerification();
+
         // Save user details to Firestore
         final newUser = UserModel(
           id: user.uid,
           name: '${firstName.text.trim()} ${lastName.text.trim()}',
           email: email.text.trim(),
-          phone: combinedPhoneNumber, // Save combined phone number
+          phone: combinedPhoneNumber,
           age: age.text.trim(),
           gender: gender.value.trim(),
           weight: weight.text.trim(),
@@ -90,27 +96,30 @@ class Userdetailscontroller extends GetxController {
         final userRepository = Get.put(UserRepository());
         await userRepository.savedUserRecord(newUser);
 
+        // Optional: confirm saved data
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('Users')
             .doc(newUser.id)
             .get();
 
         if (userDoc.exists) {
-          Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
-          print('Name fetched: ${userData['name'] ?? ''}');
+          print('Name fetched: ${userDoc['name'] ?? ''}');
         } else {
           print('User document does not exist in Firestore.');
         }
 
-        // Fetch and store the OneSignal Push Subscription ID
+        // Store OneSignal ID
         await _getPushSubscriptionIdAndStore();
 
         FullScreenLoader.stopLoading();
+
         Loaders.successSnackBar(
-          title: "Success",
-          message: "Account created successfully and details saved!",
+          title: "Email Sent",
+          message: "Verification email has been sent. Please verify to continue.",
         );
-        Get.to(() => LoginPage());
+
+        // Navigate to VerifyMail screen
+        Get.offAll(() => VerifyMail(email: email.text.trim()));
       } else {
         throw Exception("Failed to create user.");
       }
@@ -123,6 +132,7 @@ class Userdetailscontroller extends GetxController {
       );
     }
   }
+
 
   /// Function to get OneSignal Push Subscription ID and store it in Firestore
 // Function to get OneSignal Push Subscription ID and store it in Firestore

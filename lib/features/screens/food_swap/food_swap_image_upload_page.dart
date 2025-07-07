@@ -1,11 +1,9 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:gibud/features/screens/food_swap/food_swap_result_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
+import 'package:get/get.dart';
+import '../../../controllers/food_swap_controller.dart';
 
 class FoodSwapImageUploadPage extends StatefulWidget {
   const FoodSwapImageUploadPage({super.key});
@@ -16,56 +14,16 @@ class FoodSwapImageUploadPage extends StatefulWidget {
 }
 
 class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
+  final controller = Get.put(FoodSwapController());
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source, imageQuality: 80);
     if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> sendImageToAPI(BuildContext context, File imageFile) async {
-    final uri = Uri.parse("https://food-swap.onrender.com/predict");
-
-    try {
-      final request = http.MultipartRequest("POST", uri)
-        ..files.add(await http.MultipartFile.fromPath(
-          'image',
-          imageFile.path,
-          contentType: MediaType('image', 'jpeg'),
-        ));
-
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
-        final resBody = await response.stream.bytesToString();
-        final jsonData = jsonDecode(resBody);
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => FoodSwapResultsPage(
-              predictedFood: jsonData['predicted_food'],
-              nutritionInfo: Map<String, dynamic>.from(jsonData['nutritional_info']),
-              alternatives: List<dynamic>.from(jsonData['alternatives']),
-            ),
-          ),
-        );
-      } else {
-        print("❌ Failed with status: ${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Upload failed')),
-        );
-      }
-    } catch (e) {
-      print("❌ Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error occurred: $e')),
-      );
+      final file = File(pickedFile.path);
+      setState(() => _selectedImage = file);
+      controller.setImage(file); // 👈 Store in controller
     }
   }
 
@@ -141,7 +99,12 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
                   height: 52,
                   child: ElevatedButton(
                     onPressed: () async {
-                      await _pickImage(ImageSource.camera);
+                      final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+                      if (pickedFile != null) {
+                        final file = File(pickedFile.path);
+                        setState(() => _selectedImage = file);
+                        controller.setImage(file);
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
@@ -165,7 +128,12 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
                   height: 52,
                   child: OutlinedButton(
                     onPressed: () async {
-                      await _pickImage(ImageSource.gallery);
+                      final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+                      if (pickedFile != null) {
+                        final file = File(pickedFile.path);
+                        setState(() => _selectedImage = file);
+                        controller.setImage(file);
+                      }
                     },
                     style: OutlinedButton.styleFrom(
                       backgroundColor: const Color(0xFFF7F3F3),
@@ -189,9 +157,9 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_selectedImage != null) {
-                        sendImageToAPI(context, _selectedImage!);
+                        await controller.analyzeFoodImage(context);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("Please select an image first.")),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:gibud/app.dart'; // Your App entry point
+import 'package:gibud/app.dart';
 import 'package:gibud/data/repositories/authentication/authentication_repository.dart';
 import 'package:gibud/secrets.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -13,9 +13,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<void> main() async {
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-
-
-  // Debug: Print environment variables
 
   final oneSignalAppId = ONESIGNAL_INITIALISE_ID;
   if (oneSignalAppId.isEmpty) {
@@ -36,7 +33,13 @@ Future<void> main() async {
   // Initialize Authentication Repository
   Get.put(AuthenticationRepository());
 
-  // Store OneSignal Push Subscription ID in Firestore
+  // Optional Backfill (Run once when needed)
+  const shouldBackfillSurveys = true; // ✅ Toggle this to true only once!
+  if (shouldBackfillSurveys) {
+    await _backfillSurveyIds();
+  }
+
+  // Store OneSignal Push Subscription ID
   await _getPushSubscriptionIdAndStore();
 
   // Run the app
@@ -62,5 +65,30 @@ Future<void> _getPushSubscriptionIdAndStore() async {
     }
   } else {
     debugPrint("⚠️ No user logged in. Cannot fetch OneSignal Push Subscription ID.");
+  }
+}
+
+Future<void> _backfillSurveyIds() async {
+  try {
+    final firestore = FirebaseFirestore.instance;
+    final surveys = await firestore.collection('Surveys').get();
+
+    int updatedCount = 0;
+
+    for (var doc in surveys.docs) {
+      final data = doc.data();
+
+      // Only update if 'id' field doesn't exist
+      if (!data.containsKey('id') && data.containsKey('userId')) {
+        final userId = data['userId'];
+        await doc.reference.update({'id': userId});
+        updatedCount++;
+        debugPrint("✅ Backfilled survey doc: ${doc.id} with id = $userId");
+      }
+    }
+
+    debugPrint("🎉 Backfill completed: $updatedCount documents updated.");
+  } catch (e) {
+    debugPrint("❌ Failed to backfill Surveys: $e");
   }
 }

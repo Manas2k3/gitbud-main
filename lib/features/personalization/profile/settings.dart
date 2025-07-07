@@ -90,7 +90,7 @@ class SettingsScreen extends StatelessWidget {
                       future: _getUserData(), // Call the async function to get user data
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator(); // Loading state
+                          return CircularProgressIndicator(color: Colors.white,); // Loading state
                         } else if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}'); // Error handling
                         } else if (snapshot.hasData) {

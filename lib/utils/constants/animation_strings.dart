@@ -7,4 +7,6 @@ class AnimationStrings {
 
   static const typingAnimation = "assets/animations/typing.json";
 
+  static const foodLoadingAnimation = "assets/animations/foodLoadingAnimation.json";
+
 }

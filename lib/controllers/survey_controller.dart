@@ -56,8 +56,10 @@
           'createdAt': Timestamp.now(),
           'questionResponseJsonArray': questionResponses.map((e) => e.toJson()).toList(),
           'questionScore': totalScore.value,
-          'userId': userId,
+          'userId': userId, // existing field
+          'id': userId,     // 🔥 new field added to match Users collection
         };
+
 
         // Submit to Firestore
         await FirebaseFirestore.instance.collection('Surveys').add(surveyData);
