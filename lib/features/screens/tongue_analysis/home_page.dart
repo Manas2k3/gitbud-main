@@ -21,7 +21,6 @@ import '../../../features/screens/home/widgets/dynamic_cards.dart';
 import '../../../utils/constants/image_strings.dart';
 import '../../personalization/profile/settings.dart';
 import '../kids/kids_section.dart';
-import '../tongue_analysis/home_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -102,11 +101,6 @@ class _HomePageState extends State<HomePage> {
       'title': 'Discover Personalized Nutrition \nInsights From Your Plate',
       'image': ImageStrings.foodSwapImage,
       'navigateTo': FoodSwapImageUploadPage(),
-    },
-    {
-      'title': 'Insights That Start With Your Tongue',
-      'image': ImageStrings.foodSwapImage,
-      'navigateTo': TongueAnalysisPage(),
     },
   ];
 
