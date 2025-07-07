@@ -21,7 +21,7 @@ import '../../../features/screens/home/widgets/dynamic_cards.dart';
 import '../../../utils/constants/image_strings.dart';
 import '../../personalization/profile/settings.dart';
 import '../kids/kids_section.dart';
-import '../tongue_analysis/home_page.dart';
+import '../tongue_analysis/tongue_analysis_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
