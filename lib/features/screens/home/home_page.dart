@@ -105,7 +105,7 @@ class _HomePageState extends State<HomePage> {
     },
     {
       'title': 'Insights That Start With Your Tongue',
-      'image': ImageStrings.foodSwapImage,
+      'image': ImageStrings.tongueAnalysisImage,
       'navigateTo': TongueAnalysisPage(),
     },
   ];
