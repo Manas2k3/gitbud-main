@@ -99,6 +99,7 @@ class _OtpPageState extends State<OtpPage> with CodeAutoFill {
     return SizedBox(
       width: 50,
       child: TextFormField(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: otpControllers[index],
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
