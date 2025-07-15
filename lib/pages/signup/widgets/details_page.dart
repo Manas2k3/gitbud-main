@@ -33,6 +33,7 @@ class _DetailsPageState extends State<DetailsPage> {
               child: Column(
                 children: [
                   CustomAppBar(
+              showBackArrow: true,
                     title: Text(
                       'Enter the Details Below',
                       style: GoogleFonts.poppins(
@@ -410,6 +411,7 @@ class _DetailsPageState extends State<DetailsPage> {
                 controller.sendDetails(context);
               },
             ),
+            SizedBox(height: MediaQuery.of(context).size.height*0.03,)
           ],
         ),
       ),

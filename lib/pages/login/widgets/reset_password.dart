@@ -27,7 +27,7 @@ class ResetPassword extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center, // Center the column
             children: [
-              /// Image at the top
+              /// Image at the to
               Center(
                 child: Image.asset(
                   ImageStrings.mailSent,

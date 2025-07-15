@@ -98,34 +98,42 @@ class _OtpPageState extends State<OtpPage> with CodeAutoFill {
   Widget _buildOtpBox(BuildContext context, int index) {
     return SizedBox(
       width: 50,
-      child: TextFormField(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        controller: otpControllers[index],
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.center,
-        style: GoogleFonts.poppins(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        decoration: InputDecoration(
-          counterText: "",
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey.shade400),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.blue),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          textSelectionTheme: const TextSelectionThemeData(
+            selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
           ),
         ),
-        maxLength: 1,
-        onChanged: (value) {
-          if (value.length == 1 && index < otpControllers.length - 1) {
-            FocusScope.of(context).nextFocus();
-          } else if (value.isEmpty && index > 0) {
-            FocusScope.of(context).previousFocus();
-          }
-        },
+        child: TextFormField(
+          cursorColor: Colors.black,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          controller: otpControllers[index],
+          keyboardType: TextInputType.number,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          decoration: InputDecoration(
+            counterText: "",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey.shade400),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.blue),
+            ),
+          ),
+          maxLength: 1,
+          onChanged: (value) {
+            if (value.length == 1 && index < otpControllers.length - 1) {
+              FocusScope.of(context).nextFocus();
+            } else if (value.isEmpty && index > 0) {
+              FocusScope.of(context).previousFocus();
+            }
+          },
+        ),
       ),
     );
   }

@@ -110,7 +110,6 @@ class _EmailAuthState extends State<EmailAuth> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 25),
                     _buildSubmitButton(),
                   ],
                 ),

@@ -141,14 +141,10 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    Divider(
-                      thickness: 0.5,
-                      color: Colors.grey.shade500,
-                    ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        TextButton(onPressed: () => Get.to(RecoverPassword()), child: Text('Forgot Password?', style: GoogleFonts.poppins(color: Colors.blue, fontWeight: FontWeight.bold))),
+                        TextButton(onPressed: () => Get.to(RecoverPassword()), child: Text('Forgot Password?', style: GoogleFonts.poppins(color: Colors.redAccent, fontWeight: FontWeight.bold))),
                       ],
                     )
                   ],
@@ -181,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       'Sign Up',
                       style: GoogleFonts.poppins(
-                          color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 14),
+                          color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                   ),
                 ],
