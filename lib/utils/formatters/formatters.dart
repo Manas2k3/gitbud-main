@@ -21,7 +21,7 @@ class InputValidators {
     );
 
     if (!emailRegex.hasMatch(value)) {
-      return 'Enter a valid email address';
+      return 'Enter a valid Enter email address';
     }
 
     return null;
@@ -30,10 +30,10 @@ class InputValidators {
 
   static String? validateFirstName(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your first name';
+      return 'Enter your first name';
     }
     if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-      return 'First name can only contain letters';
+      return 'First name can only Enter contain letters';
     }
 
     return null;
@@ -42,20 +42,20 @@ class InputValidators {
 
   static String? validateLastName(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your first name';
+      return 'Enter your last name';
     }
     if (!RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
-      return 'First name can only contain letters';
+      return 'Last name can only Enter contain letters';
     }
     return null;
   }
 
   static String? validatePassword(String? value) {
       if (value == null || value.isEmpty) {
-        return 'Please enter your password';
+        return 'Enter your password';
       }
       if (value.length < 6) {
-        return 'Password must be at least 6 characters long';
+        return 'Password must be at Enter least 6 characters long';
       }
       return null;
     }
@@ -70,7 +70,7 @@ class InputValidators {
       DateFormat dateFormat = DateFormat('dd/MM/yyyy');
       dateFormat.parseStrict(value);
     } catch (e) {
-      return 'Enter a valid date in dd/MM/yyyy format';
+      return 'Enter a valid date in Enter dd/MM/yyyy format';
     }
     return null;
   }
@@ -116,7 +116,7 @@ class DateInputFormatter extends TextInputFormatter {
 String? phoneNumberValidator(String? value) {
   // Check if the value is empty
   if (value == null || value.isEmpty) {
-    return 'Please enter your phone number';
+    return 'Enter your Enter phone number';
   }
 
   // Regular expression for validating a 10-digit phone number
@@ -124,7 +124,7 @@ String? phoneNumberValidator(String? value) {
 
   // Check if the phone number matches the regular expression
   if (!phoneRegExp.hasMatch(value)) {
-    return 'Please enter a valid 10-digit phone number';
+    return 'Enter a valid Enter 10-digit phone number';
   }
 
   return null; // Return null if the phone number is valid
@@ -132,15 +132,15 @@ String? phoneNumberValidator(String? value) {
 
 String? ageValidator(String? value) {
   if (value == null || value.isEmpty) {
-    return 'Please enter your age';
+    return 'Enter your age';
   }
 
   final int? age = int.tryParse(value);
 
   if (age == null || age <= 0) {
-    return 'Please enter a valid age';
+    return 'Enter a Enter valid age';
   } else if (age < 15 || age > 100) {
-    return 'Please enter an age between 15 and 100';
+    return 'Enter an age Enter between 15 and 100';
   }
 
   return null; // Return null if age is valid
@@ -150,15 +150,15 @@ String? ageValidator(String? value) {
 
 String? weightValidator(String? value) {
   if (value == null || value.isEmpty) {
-    return 'Please enter your weight';
+    return 'Enter Enter your weight';
   }
 
   final double? weight = double.tryParse(value);
 
   if (weight == null || weight <= 0) {
-    return 'Please enter a valid weight';
+    return 'Enter a Enter valid weight';
   } else if (weight < 25 || weight > 300) {
-    return 'Weight must be between 25kg and 300kg';
+    return 'Weight must be between Enter 25kg and 300kg';
   }
 
   return null; // Return null if weight is valid
@@ -167,15 +167,15 @@ String? weightValidator(String? value) {
 
 String? heightValidator(String? value) {
   if (value == null || value.isEmpty) {
-    return 'Please enter your height';
+    return 'Enter your height';
   }
 
   final double? height = double.tryParse(value);
 
   if (height == null || height <= 0) {
-    return 'Please enter a valid height';
+    return 'Enter a Enter valid height';
   } else if (height < 50 || height > 250) {
-    return 'Height must be between 50cm and 250cm';
+    return 'Height must be between Enter 50cm and 250cm';
   }
 
   return null; // Return null if height is valid
