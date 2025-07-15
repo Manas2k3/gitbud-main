@@ -24,6 +24,8 @@
         <string>Allow access to microphone for voice and video calling.</string>
         <key>NSCameraUsageDescription</key>
         <string>Allow access to camera for video calling.</string>
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>Need gallery access to upload  image</string>
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
 		<key>LSRequiresIPhoneOS</key>
