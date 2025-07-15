@@ -129,29 +129,36 @@ class _SignupPageState extends State<SignupPage> {
 
                               /// Phone Number Input Field
                               Expanded(
-                                child: TextFormField(
-                                  cursorColor: Colors.black,
-                                  controller: controller.phoneNumber,
-                                  decoration: InputDecoration(
-                                    floatingLabelStyle:
-                                    TextStyle(color: Colors.black),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                      borderSide: BorderSide(color: Colors.black),
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    textSelectionTheme: const TextSelectionThemeData(
+                                      selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                                     ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                      borderSide: BorderSide(color: Colors.black),
-                                    ),
-                                    labelText: 'Phone Number',
                                   ),
-                                  keyboardType: TextInputType.phone,
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Phone Number is required';
-                                    }
-                                    return null;
-                                  },
+                                  child: TextFormField(
+                                    showCursor: true,
+                                    cursorColor: Colors.black,
+                                    controller: controller.phoneNumber,
+                                    decoration: InputDecoration(
+                                      floatingLabelStyle: TextStyle(color: Colors.black),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                        borderSide: BorderSide(color: Colors.black),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                        borderSide: BorderSide(color: Colors.black),
+                                      ),
+                                      labelText: 'Phone Number',
+                                    ),
+                                    keyboardType: TextInputType.phone,
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Phone Number is required';
+                                      }
+                                      return null;
+                                    },
+                                  ),
                                 ),
                               ),
                             ],

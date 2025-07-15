@@ -48,26 +48,34 @@ class RecoverPassword extends StatelessWidget {
 
             Form(
               key: controller.forgetPasswordFormKey,
-              child: TextFormField(
-                controller: controller.email,
-                decoration: InputDecoration(
-                  floatingLabelStyle: TextStyle(color: Colors.grey.shade700),
-                  labelText: "Enter your email", labelStyle: GoogleFonts.poppins(
-                  color: Colors.grey.shade700, fontWeight: FontWeight.bold
-                ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10)
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  textSelectionTheme: const TextSelectionThemeData(
+                    selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.black)
-                  ),
-                  prefixIcon: Icon(Iconsax.direct_right),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10)
-                  )
                 ),
-                validator: InputValidators.validateEmail,
+                child: TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: controller.email,
+                  decoration: InputDecoration(
+                    floatingLabelStyle: TextStyle(color: Colors.grey.shade700),
+                    labelText: "Enter your email", labelStyle: GoogleFonts.poppins(
+                    color: Colors.grey.shade700, fontWeight: FontWeight.bold
+                  ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.black)
+                    ),
+                    prefixIcon: Icon(Iconsax.direct_right),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)
+                    )
+                  ),
+                  validator: InputValidators.validateEmail,
+                ),
               ),
             ),
 

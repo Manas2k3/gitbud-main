@@ -55,38 +55,54 @@ class _DetailsPageState extends State<DetailsPage> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: TextFormField(
-                            cursorColor: Colors.black,
-                            controller: controller.firstName,
-                            decoration: InputDecoration(
-                              labelText: 'First Name',
-                              labelStyle: GoogleFonts.poppins(
-                                color: Colors.grey.shade800,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              textSelectionTheme: const TextSelectionThemeData(
+                                selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                               ),
-                              enabledBorder: _outlineInputBorder(),
-                              focusedBorder: _outlineInputBorder(),
-                              border: _outlineInputBorder(),
                             ),
-                            keyboardType: TextInputType.name,
-                            validator: (value) => InputValidators.validateFirstName(value),
+                            child: TextFormField(
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                              cursorColor: Colors.black,
+                              controller: controller.firstName,
+                              decoration: InputDecoration(
+                                labelText: 'First Name',
+                                labelStyle: GoogleFonts.poppins(
+                                  color: Colors.grey.shade800,
+                                ),
+                                enabledBorder: _outlineInputBorder(),
+                                focusedBorder: _outlineInputBorder(),
+                                border: _outlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.name,
+                              validator: (value) => InputValidators.validateFirstName(value),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 16), // Spacing between the fields
                         Expanded(
-                          child: TextFormField(
-                            cursorColor: Colors.black,
-                            controller: controller.lastName,
-                            decoration: InputDecoration(
-                              labelText: 'Last Name',
-                              labelStyle: GoogleFonts.poppins(
-                                color: Colors.grey.shade800,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              textSelectionTheme: const TextSelectionThemeData(
+                                selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                               ),
-                              enabledBorder: _outlineInputBorder(),
-                              focusedBorder: _outlineInputBorder(),
-                              border: _outlineInputBorder(),
                             ),
-                            keyboardType: TextInputType.name,
-                            validator: (value) => InputValidators.validateLastName(value),
+                            child: TextFormField(
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                              cursorColor: Colors.black,
+                              controller: controller.lastName,
+                              decoration: InputDecoration(
+                                labelText: 'Last Name',
+                                labelStyle: GoogleFonts.poppins(
+                                  color: Colors.grey.shade800,
+                                ),
+                                enabledBorder: _outlineInputBorder(),
+                                focusedBorder: _outlineInputBorder(),
+                                border: _outlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.name,
+                              validator: (value) => InputValidators.validateLastName(value),
+                            ),
                           ),
                         ),
                       ],
@@ -96,20 +112,28 @@ class _DetailsPageState extends State<DetailsPage> {
                   // Age Field
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: TextFormField(
-                      cursorColor: Colors.black,
-                      controller: controller.age,
-                      decoration: InputDecoration(
-                        labelText: 'Age',
-                        labelStyle: GoogleFonts.poppins(
-                          color: Colors.grey.shade800,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        textSelectionTheme: const TextSelectionThemeData(
+                          selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                         ),
-                        enabledBorder: _outlineInputBorder(),
-                        focusedBorder: _outlineInputBorder(),
-                        border: _outlineInputBorder(),
                       ),
-                      keyboardType: TextInputType.number,
-                      validator: ageValidator,
+                      child: TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        cursorColor: Colors.black,
+                        controller: controller.age,
+                        decoration: InputDecoration(
+                          labelText: 'Age',
+                          labelStyle: GoogleFonts.poppins(
+                            color: Colors.grey.shade800,
+                          ),
+                          enabledBorder: _outlineInputBorder(),
+                          focusedBorder: _outlineInputBorder(),
+                          border: _outlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: ageValidator,
+                      ),
                     ),
                   ),
 
@@ -119,38 +143,54 @@ class _DetailsPageState extends State<DetailsPage> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: TextFormField(
-                            cursorColor: Colors.black,
-                            controller: controller.height,
-                            decoration: InputDecoration(
-                              labelText: 'Height (cm)',
-                              labelStyle: GoogleFonts.poppins(
-                                color: Colors.grey.shade800,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              textSelectionTheme: const TextSelectionThemeData(
+                                selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                               ),
-                              enabledBorder: _outlineInputBorder(),
-                              focusedBorder: _outlineInputBorder(),
-                              border: _outlineInputBorder(),
                             ),
-                            keyboardType: TextInputType.number,
-                            validator: heightValidator,
+                            child: TextFormField(
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                              cursorColor: Colors.black,
+                              controller: controller.height,
+                              decoration: InputDecoration(
+                                labelText: 'Height (cm)',
+                                labelStyle: GoogleFonts.poppins(
+                                  color: Colors.grey.shade800,
+                                ),
+                                enabledBorder: _outlineInputBorder(),
+                                focusedBorder: _outlineInputBorder(),
+                                border: _outlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                              validator: heightValidator,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 16), // Spacing between the fields
                         Expanded(
-                          child: TextFormField(
-                            cursorColor: Colors.black,
-                            controller: controller.weight,
-                            decoration: InputDecoration(
-                              labelText: 'Weight (kg)',
-                              labelStyle: GoogleFonts.poppins(
-                                color: Colors.grey.shade800,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              textSelectionTheme: const TextSelectionThemeData(
+                                selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                               ),
-                              enabledBorder: _outlineInputBorder(),
-                              focusedBorder: _outlineInputBorder(),
-                              border: _outlineInputBorder(),
                             ),
-                            keyboardType: TextInputType.number,
-                            validator: weightValidator,
+                            child: TextFormField(
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                              cursorColor: Colors.black,
+                              controller: controller.weight,
+                              decoration: InputDecoration(
+                                labelText: 'Weight (kg)',
+                                labelStyle: GoogleFonts.poppins(
+                                  color: Colors.grey.shade800,
+                                ),
+                                enabledBorder: _outlineInputBorder(),
+                                focusedBorder: _outlineInputBorder(),
+                                border: _outlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                              validator: weightValidator,
+                            ),
                           ),
                         ),
                       ],
@@ -238,32 +278,40 @@ class _DetailsPageState extends State<DetailsPage> {
                         SizedBox(width: 10),
                         /// Phone Number Input Field
                         Expanded(
-                          child: TextFormField(
-                            cursorColor: Colors.black,
-                            controller: controller.phoneNumber,
-                            decoration: InputDecoration(
-                              floatingLabelStyle: TextStyle(color: Colors.black),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                                borderSide: BorderSide(color: Colors.black),
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              textSelectionTheme: const TextSelectionThemeData(
+                                selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                                borderSide: BorderSide(color: Colors.blue),
-                              ),
-                              labelText: 'Phone Number',
                             ),
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Phone Number is required';
-                              }
-                              return null;
-                            },
-                            onChanged: (value) {
-                              // Update the phone number in the controller
-                              controller.combinedPhoneNumber = '$selectedCountryCode$value';
-                            },
+                            child: TextFormField(
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                              cursorColor: Colors.black,
+                              controller: controller.phoneNumber,
+                              decoration: InputDecoration(
+                                floatingLabelStyle: TextStyle(color: Colors.black),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide(color: Colors.black),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide(color: Colors.blue),
+                                ),
+                                labelText: 'Phone Number',
+                              ),
+                              keyboardType: TextInputType.phone,
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Phone Number is required';
+                                }
+                                return null;
+                              },
+                              onChanged: (value) {
+                                // Update the phone number in the controller
+                                controller.combinedPhoneNumber = '$selectedCountryCode$value';
+                              },
+                            ),
                           ),
                         ),
                       ],
@@ -274,20 +322,28 @@ class _DetailsPageState extends State<DetailsPage> {
                   ///email field
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: TextFormField(
-                      cursorColor  : Colors.black,
-                      controller: controller.email,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        labelStyle: GoogleFonts.poppins(
-                          color: Colors.grey.shade800,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        textSelectionTheme: const TextSelectionThemeData(
+                          selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                         ),
-                        enabledBorder: _outlineInputBorder(),
-                        focusedBorder: _outlineInputBorder(),
-                        border: _outlineInputBorder(),
                       ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) => InputValidators.validateEmail(value),
+                      child: TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        cursorColor  : Colors.black,
+                        controller: controller.email,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          labelStyle: GoogleFonts.poppins(
+                            color: Colors.grey.shade800,
+                          ),
+                          enabledBorder: _outlineInputBorder(),
+                          focusedBorder: _outlineInputBorder(),
+                          border: _outlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) => InputValidators.validateEmail(value),
+                      ),
                     ),
                   ),
 
@@ -295,43 +351,51 @@ class _DetailsPageState extends State<DetailsPage> {
                   /// Password Field
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: TextFormField(
-                      controller: controller.password,
-                      cursorColor: Colors.black,
-                      obscureText: _obscureText,
-                      decoration: InputDecoration(
-                        floatingLabelStyle: TextStyle(color: Colors.black),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.black)
-                        ),
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureText ? Icons.visibility : Icons.visibility_off,
-                            color: Colors.redAccent,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
-                        ),
-                        labelText: 'Password',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        textSelectionTheme: const TextSelectionThemeData(
+                          selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
+                      child: TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        controller: controller.password,
+                        cursorColor: Colors.black,
+                        obscureText: _obscureText,
+                        decoration: InputDecoration(
+                          floatingLabelStyle: TextStyle(color: Colors.black),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.black),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.black)
+                          ),
+                          prefixIcon: Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText ? Icons.visibility : Icons.visibility_off,
+                              color: Colors.redAccent,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                          ),
+                          labelText: 'Password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.length < 6) {
+                            return 'Password must be at least 6 characters';
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                   ),
                 ],

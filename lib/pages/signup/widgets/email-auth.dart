@@ -149,57 +149,73 @@ class _EmailAuthState extends State<EmailAuth> {
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
   }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: GoogleFonts.poppins(
-          color: Colors.grey.shade700,
-          fontWeight: FontWeight.bold,
-        ),
-        prefixIcon: prefixIcon,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.black),
+    return Theme(
+      data: Theme.of(context).copyWith(
+        textSelectionTheme: const TextSelectionThemeData(
+          selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
         ),
       ),
-      keyboardType: keyboardType,
-      validator: validator,
+      child: TextFormField(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: GoogleFonts.poppins(
+            color: Colors.grey.shade700,
+            fontWeight: FontWeight.bold,
+          ),
+          prefixIcon: prefixIcon,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.black),
+          ),
+        ),
+        keyboardType: keyboardType,
+        validator: validator,
+      ),
     );
   }
 
   Widget _buildPasswordField() {
-    return TextFormField(
-      controller: controller.password,
-      obscureText: _obscureText,
-      decoration: InputDecoration(
-        labelText: "Enter your password",
-        prefixIcon: const Icon(Icons.lock),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _obscureText ? Icons.visibility : Icons.visibility_off,
-            color: Colors.redAccent,
-          ),
-          onPressed: () => setState(() => _obscureText = !_obscureText),
-        ),
-        labelStyle: GoogleFonts.poppins(
-          color: Colors.grey.shade700,
-          fontWeight: FontWeight.bold,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.black),
+    return Theme(
+      data: Theme.of(context).copyWith(
+        textSelectionTheme: const TextSelectionThemeData(
+          selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
         ),
       ),
-      validator: (value) => value != null && value.length < 6
-          ? 'Password must be at least 6 characters'
-          : null,
+      child: TextFormField(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        controller: controller.password,
+        obscureText: _obscureText,
+        decoration: InputDecoration(
+          labelText: "Enter your password",
+          prefixIcon: const Icon(Icons.lock),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _obscureText ? Icons.visibility : Icons.visibility_off,
+              color: Colors.redAccent,
+            ),
+            onPressed: () => setState(() => _obscureText = !_obscureText),
+          ),
+          labelStyle: GoogleFonts.poppins(
+            color: Colors.grey.shade700,
+            fontWeight: FontWeight.bold,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.black),
+          ),
+        ),
+        validator: (value) => value != null && value.length < 6
+            ? 'Password must be at least 6 characters'
+            : null,
+      ),
     );
   }
 

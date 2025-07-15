@@ -1,0 +1,7 @@
+deep_red
+healthy
+indigo_violet
+purple
+unusual_shape
+white
+yellow
