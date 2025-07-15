@@ -28,4 +28,6 @@ class ImageStrings {
   static const kidImage = "assets/images/boy.png";
 
   static const foodSwapImage = "assets/images/food_swap_image.jpg";
+
+  static const tongueAnalysisImage = "assets/images/tongue_analysis_page.png";
 }
