@@ -34,7 +34,7 @@ Future<void> main() async {
   Get.put(AuthenticationRepository());
 
   // Optional Backfill (Run once when needed)
-  const shouldBackfillSurveys = true; // ✅ Toggle this to true only once!
+  const shouldBackfillSurveys = false; // ✅ Toggle this to true only once!
   if (shouldBackfillSurveys) {
     await _backfillSurveyIds();
   }
