@@ -3,31 +3,44 @@ import 'package:get/get.dart';
 import '../../common/loader/animation_loader.dart';
 
 class FullScreenLoader {
-  static void openLoadingDialog(String text, String animation) {
-    showDialog(
-      context: Get.overlayContext!,
-      barrierDismissible: false,
-      builder: (_) => PopScope(
-        canPop: false, // Prevent dialog from being dismissed
-        child: Container(
+  static bool _isShowing = false;
+  static VoidCallback? _onCancel;
+
+  static void openLoadingDialog(String text, String animation, {VoidCallback? onCancel}) {
+    if (_isShowing) return;
+
+    _isShowing = true;
+    _onCancel = onCancel;
+
+    Get.dialog(
+      WillPopScope(
+        onWillPop: () async {
+          _handleCancel(); // 👈 manually trigger cancel
+          return false;
+        },
+        child: Material(
           color: Colors.white,
-          width: double.infinity,
-          height: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 250),
-              AnimationLoader(text: text, animation: animation),
-            ],
+          child: Center(
+            child: AnimationLoader(text: text, animation: animation),
           ),
         ),
       ),
+      barrierDismissible: false,
     );
   }
 
   static void stopLoading() {
-    if (Get.overlayContext != null) {
-      Navigator.of(Get.overlayContext!).pop();
+    if (Get.isDialogOpen == true) {
+      Get.back();
     }
+    _isShowing = false;
+    _onCancel = null;
+  }
+
+  static void _handleCancel() {
+    if (_onCancel != null) {
+      _onCancel!(); // 👈 call the controller-defined cancel logic
+    }
+    stopLoading(); // 👈 ensures the dialog actually closes
   }
 }
