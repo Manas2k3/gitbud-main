@@ -49,7 +49,7 @@ class TongueAnalysisController extends GetxController {
     try {
       isLoading.value = true;
 
-      final uri = Uri.parse("https://b6741adcf34b.ngrok-free.app/predict");
+      final uri = Uri.parse("https://01f6dbfbfd18.ngrok-free.app/predict");
       final request = http.MultipartRequest("POST", uri);
 
       final mimeType = lookupMimeType(imageFile.path);
