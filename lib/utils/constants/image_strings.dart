@@ -30,4 +30,6 @@ class ImageStrings {
   static const foodSwapImage = "assets/images/food_swap_image.jpg";
 
   static const tongueAnalysisImage = "assets/images/tongue_analysis_page.png";
+
+  static const sampleTongueImage = "assets/images/tounge_sample_image.jpg";
 }
