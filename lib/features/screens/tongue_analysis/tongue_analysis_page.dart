@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gibud/features/screens/tongue_analysis/widgets/TongueAnalysisResultPage.dart';
+import 'package:gibud/utils/constants/image_strings.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../controllers/tongue_analysis_controller.dart';
@@ -46,7 +47,7 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: true,
+        leading: IconButton(onPressed: () => Get.back(), icon: Icon(Icons.arrow_back)),
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
@@ -143,8 +144,8 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
                 width: imageWidth,
                 fit: BoxFit.cover,
               )
-                  : Image.network(
-                "https://4845087.fs1.hubspotusercontent-na1.net/hub/4845087/hubfs/GSD-Scalloped-Tongue-Causes-and-Treatment-Blog-01.27.2210.21.21%20%281%29.jpg?width=712&name=GSD-Scalloped-Tongue-Causes-and-Treatment-Blog-01.27.2210.21.21%20%281%29.jpg",
+                  : Image.asset(
+                ImageStrings.sampleTongueImage,
                 height: imageHeight,
                 width: imageWidth,
                 fit: BoxFit.cover,
@@ -187,6 +188,7 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
                 ),
               ),
             ),
+            SizedBox(height: MediaQuery.of(context).size.height*0.03)
 
           ],
         ),
