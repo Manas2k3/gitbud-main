@@ -94,24 +94,27 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
             child: Column(
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 80);
-                      if (pickedFile != null) {
-                        final file = File(pickedFile.path);
-                        setState(() => _selectedImage = file);
-                        controller.setImage(file);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
+                GestureDetector(
+                  onTap: () async {
+                    final pickedFile = await _picker.pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 80,
+                    );
+                    if (pickedFile != null) {
+                      final file = File(pickedFile.path);
+                      setState(() => _selectedImage = file);
+                      controller.setImage(file);
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 52,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(30),
                     ),
+                    alignment: Alignment.center,
                     child: Text(
                       "Take a photo",
                       style: GoogleFonts.poppins(
@@ -123,67 +126,71 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-                      if (pickedFile != null) {
-                        final file = File(pickedFile.path);
-                        setState(() => _selectedImage = file);
-                        controller.setImage(file);
-                      }
-                    },
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF7F3F3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      side: BorderSide.none,
+                GestureDetector(
+                  onTap: () async {
+                    final pickedFile = await _picker.pickImage(
+                      source: ImageSource.gallery,
+                      imageQuality: 80,
+                    );
+                    if (pickedFile != null) {
+                      final file = File(pickedFile.path);
+                      setState(() => _selectedImage = file);
+                      controller.setImage(file);
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 52,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF7F3F3),
+                      borderRadius: BorderRadius.circular(30),
                     ),
+                    alignment: Alignment.center,
                     child: Text(
                       "Upload an image",
                       style: GoogleFonts.poppins(
+                        color: Colors.black,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black,
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_selectedImage != null) {
-                        await controller.analyzeFoodImage(context);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Please select an image first.")),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
+                GestureDetector(
+                  onTap: () async {
+                    if (_selectedImage != null) {
+                      await controller.analyzeFoodImage(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please select an image first.")),
+                      );
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 52,
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(30),
                     ),
+                    alignment: Alignment.center,
                     child: Text(
                       "Analyze Meal",
                       style: GoogleFonts.poppins(
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
                       ),
                     ),
                   ),
                 ),
+                SizedBox(height: MediaQuery.of(context).size.height*0.04,)
               ],
             ),
+
           ),
         ],
       ),
