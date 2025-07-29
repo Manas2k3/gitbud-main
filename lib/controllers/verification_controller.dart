@@ -71,11 +71,11 @@ class VerificationController extends GetxController {
         id: user.uid,
         name: '${firstName.text.trim()} ${lastName.text.trim()}',
         phone: phoneNumber.text.trim(),
-        age: age.text.trim(),
+        // age: age.text.trim(),
         selectedRole: selectedRole.value.trim(),
-        gender: gender.value.trim(),
-        weight: weight.text.trim(),
-        height: height.text.trim(),
+        // gender: gender.value.trim(),
+        // weight: weight.text.trim(),
+        // height: height.text.trim(),
         email: '', gutTestPaymentStatus: false, createdAt: DateTime.now(),
       );
 

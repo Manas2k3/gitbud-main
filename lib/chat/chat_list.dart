@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/firestore_service.dart';
 import 'individual_chat_page.dart';
@@ -16,8 +15,7 @@ class ChatListPage extends StatelessWidget {
     required String dieticianId,
   }) : super(key: key);
 
-  Future<String> fetchLastMessage(
-      String currentUserId, String dieticianId) async {
+  Future<String> fetchLastMessage(String currentUserId, String dieticianId) async {
     try {
       final chatQuery = await FirebaseFirestore.instance
           .collection('Chats')
@@ -40,14 +38,21 @@ class ChatListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        leading: IconButton(onPressed: () => Get.back(), icon: Icon(Icons.arrow_back, color: Colors.white,)),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+        ),
         title: Text(
           'Chat with Dieticians',
-          style: GoogleFonts.poppins(fontSize: 20, color: Colors.white),
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
         ),
       ),
       body: FutureBuilder<List<ChatModel>>(
@@ -61,45 +66,73 @@ class ChatListPage extends StatelessWidget {
           }
 
           final dieticians = snapshot.data ?? [];
+
           return ListView.builder(
             itemCount: dieticians.length,
             itemBuilder: (context, index) {
               final dietician = dieticians[index];
+
               return FutureBuilder<String>(
                 future: fetchLastMessage(currentUserId, dietician.id),
                 builder: (context, messageSnapshot) {
-                  if (messageSnapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return ListTile(
-                      title: Text(
-                        'Loading...',
-                        style: GoogleFonts.poppins(),
-                      ),
-                      subtitle: Text('Fetching last message...',
-                          style: GoogleFonts.poppins()),
-                    );
-                  }
-
                   final lastMessage = messageSnapshot.data ?? 'No messages yet';
 
-                  return ListTile(
-                    title: Text(
-                      dietician.name,
-                      style: GoogleFonts.poppins(fontSize: 16),
-                    ),
-                    subtitle: Text(
-                      lastMessage,
-                      style: GoogleFonts.poppins(),
-                    ),
+                  return InkWell(
                     onTap: () async {
-                      // Create or fetch a chat with the selected dietician
                       final chatId = await FirestoreService().getOrCreateChat(
                         currentUserId,
                         dietician.id,
                       );
-                      // Navigate to the chat page
                       Get.to(() => IndividualChatPage(chatId: chatId));
                     },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundImage: NetworkImage(
+                              dietician.photoUrl ??
+                                  'https://i.pinimg.com/474x/e6/e4/df/e6e4df26ba752161b9fc6a17321fa286.jpg',
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${dietician.name}',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  lastMessage,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // Text(
+                          //   'Online', // <- Replace this with real timestamp if available
+                          //   style: GoogleFonts.poppins(
+                          //     fontSize: 12,
+                          //     color: Colors.grey[500],
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ),
                   );
                 },
               );

@@ -9,15 +9,15 @@ class Loaders {
     required String title,
     required String message,
   }) {
-    Get.snackbar(
+    Get.snackbar(animationDuration: Duration(milliseconds: 1000),
+      duration: Duration(milliseconds: 1000),
       title,
       message,
       isDismissible: true,
       shouldIconPulse: true,
       colorText: Colors.white,
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.green.shade400,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3), // Set duration to 3 seconds
       margin: const EdgeInsets.all(10),
       icon: const Icon(Iconsax.check, color: Colors.white),
     );
@@ -29,14 +29,15 @@ class Loaders {
     required String message,
   }) {
     Get.snackbar(
+      animationDuration: Duration(milliseconds: 1000),
+      duration: Duration(milliseconds: 1000),
       title,
       message,
       isDismissible: true,
       shouldIconPulse: true,
       colorText: Colors.white,
-      backgroundColor: Colors.orange,
+      backgroundColor: Colors.orange.shade400,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3), // Set duration to 3 seconds
       margin: const EdgeInsets.all(20),
       icon: const Icon(Iconsax.warning_2, color: Colors.white),
     );
@@ -48,14 +49,15 @@ class Loaders {
     required String message,
   }) {
     Get.snackbar(
+      animationDuration: Duration(milliseconds: 1000),
+      duration: Duration(milliseconds: 1000),
       title,
       message,
       isDismissible: true,
       shouldIconPulse: true,
       colorText: Colors.white,
-      backgroundColor: Colors.redAccent,
+      backgroundColor: Colors.redAccent.shade400,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3), // Set duration to 3 seconds
       margin: const EdgeInsets.all(10),
       icon: const Icon(
         Icons.error_outline,

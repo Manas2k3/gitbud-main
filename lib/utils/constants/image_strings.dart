@@ -6,8 +6,7 @@ class ImageStrings {
   static const String onBoardingImage3 =
       "assets/images/onBoardingImages/onBoarding3.jpg";
 
-  static const splashScreenImage =
-      "assets/images/splashScreenImage/splash.png";
+  static const splashScreenImage = "assets/images/splashScreenImage/splash.png";
 
   static const logoImage = "assets/logo/logo_black.png";
 
@@ -32,4 +31,10 @@ class ImageStrings {
   static const tongueAnalysisImage = "assets/images/tongue_analysis_page.png";
 
   static const sampleTongueImage = "assets/images/tounge_sample_image.jpg";
+
+  static const honestImage = "assets/images/honest.png";
+
+  static const lockImage = "assets/images/lock.svg";
+
+  static const informationImage = "assets/images/information.svg";
 }

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gibud/features/screens/tongue_analysis/tongue_analysis_page.dart';
@@ -10,43 +9,66 @@ class TongueAnalysisResultPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final args = Get.arguments ?? {};
-    final String prediction = args['predicted_class'] ?? "Unknown";
+    final String prediction = args['predicted_class']?.toLowerCase() ?? "unknown";
     final double confidence = args['confidence']?.toDouble() ?? 0.0;
     final File? imageFile = args['imageFile'];
 
+    // 🌸 Mapping of model output → full condition keys
+    final Map<String, String> labelToDetailKey = {
+      "yellow": "yellow",
+      "purple": "purple",
+      "red": "red_tongue_stroke",
+      "white": "white_tongue_anemia",
+      "deep_red": "deep_red",
+      "indigo_violet": "indigo_violet",
+    };
+
+    // 💊 Diagnosis details
     final Map<String, dynamic> diagnosisDetails = {
-      "mild_anemia": {
-        "description":
-        "Your tongue shows signs that may be associated with mild anemia. Stay hydrated and consult a physician.",
-        "risk": 1,
-      },
-      "white_tongue_anemia": {
-        "description":
-        "This may be a sign of white tongue condition associated with anemia. Maintain good oral hygiene and check your iron levels.",
+      "yellow": {
+        "description": "Yellow tongue may be a potential indicator of diabetes. It's advised to consult your healthcare provider for further evaluation.",
         "risk": 2,
       },
-      "red_tongue_stroke": {
-        "description":
-        "This may indicate high temperature or stroke risk. Seek medical attention if symptoms persist.",
+      "purple": {
+        "description": "Purple tongue with greasy coating may suggest underlying conditions like cancer. Please seek immediate medical attention.",
         "risk": 3,
       },
-      "purple": {
-        "description":
-        "This tongue appearance might suggest poor circulation or underlying health issues. Please consult your doctor for further evaluation.",
+      "red_tongue_stroke": {
+        "description": "An unusually shaped red tongue could signify risk of acute stroke. Prompt medical consultation is recommended.",
+        "risk": 3,
+      },
+      "white_tongue_anemia": {
+        "description": "White tongue is a possible sign of anemia. Consider checking your iron levels and improving nutritional intake.",
+        "risk": 2,
+      },
+      "deep_red": {
+        "description": "A deep-red tongue is associated with severe COVID-19 cases. It's advised to get a medical screening done immediately.",
+        "risk": 3,
+      },
+      "indigo_violet": {
+        "description": "Indigo or violet tongue may indicate vascular or gastrointestinal issues. It's best to undergo a medical check-up.",
         "risk": 2,
       },
     };
 
-    final detail = diagnosisDetails[prediction.toLowerCase()] ??
-        {
-          "description": "No information available for this condition.",
-          "risk": 0,
-        };
+    // 🧠 Final key to use
+    final String? mappedKey = labelToDetailKey[prediction];
+    final detail = mappedKey != null && diagnosisDetails.containsKey(mappedKey)
+        ? diagnosisDetails[mappedKey]
+        : {
+      "description": "No information available for this condition.",
+      "risk": 0,
+    };
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Tongue Analysis"),
-        leading: IconButton(onPressed: () {Get.offAll(TongueAnalysisPage());}, icon: Icon(Icons.arrow_back)),
+        leading: IconButton(
+          onPressed: () {
+            Get.offAll(TongueAnalysisPage());
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -54,7 +76,7 @@ class TongueAnalysisResultPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Prediction
+            // 🏷️ Prediction Title
             Text(
               prediction.replaceAll("_", " ").capitalizeFirst ?? "Prediction",
               style: const TextStyle(
@@ -64,7 +86,7 @@ class TongueAnalysisResultPage extends StatelessWidget {
             ),
             const SizedBox(height: 4),
 
-            // Confidence
+            // 📊 Confidence
             Text(
               "Confidence: ${confidence.toStringAsFixed(1)}%",
               style: TextStyle(
@@ -74,7 +96,7 @@ class TongueAnalysisResultPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Image
+            // 📷 Image
             if (imageFile != null)
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
@@ -97,14 +119,14 @@ class TongueAnalysisResultPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Description
+            // 🩺 Description
             Text(
               detail["description"],
               style: const TextStyle(fontSize: 15),
             ),
             const SizedBox(height: 24),
 
-            // Risk Level
+            // ⚠️ Risk Level
             const Text(
               "Risk Level",
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
@@ -117,13 +139,13 @@ class TongueAnalysisResultPage extends StatelessWidget {
                     value: (detail["risk"] as int) / 3.0,
                     minHeight: 8,
                     backgroundColor: Colors.grey.shade300,
-                    color: Colors.black87,
+                    color: Colors.redAccent,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text("${detail["risk"]}"),
               ],
-            )
+            ),
           ],
         ),
       ),

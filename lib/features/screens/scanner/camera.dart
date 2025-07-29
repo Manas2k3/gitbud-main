@@ -1,11 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:gibud/common/components/widgets/custom_shapes/containers/primary_header_container.dart';
-import 'package:gibud/common/widgets/appbar/appbar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:shimmer/shimmer.dart';
 import 'captured_image_page.dart';
 
 class Camera extends StatefulWidget {
@@ -15,28 +13,69 @@ class Camera extends StatefulWidget {
   State<Camera> createState() => _CameraState();
 }
 
-class _CameraState extends State<Camera> {
+class _CameraState extends State<Camera> with TickerProviderStateMixin {
   final ImagePickerService _imagePickerService = ImagePickerService();
+  File? _previewImage;
+  bool _isLoading = false;
 
-  Future<void> _pickImageFromGallery() async {
-    final pickedImage = await _imagePickerService.pickImageFromGallery();
-    if (pickedImage != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CapturedImagePage(image: pickedImage),
-        ),
-      );
-    }
+  late AnimationController _iconPulseController;
+
+  @override
+  void initState() {
+    super.initState();
+    _iconPulseController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true);
   }
 
-  Future<void> _captureImageFromCamera() async {
-    final capturedImage = await _imagePickerService.captureImageFromCamera();
-    if (capturedImage != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CapturedImagePage(image: capturedImage),
+  @override
+  void dispose() {
+    _iconPulseController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleImagePick(Future<File?> Function() pickerFn) async {
+    setState(() => _isLoading = true);
+
+    final pickedImage = await pickerFn();
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    setState(() {
+      _previewImage = pickedImage;
+      _isLoading = false;
+    });
+
+    if (pickedImage != null) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          contentPadding: const EdgeInsets.all(8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.file(pickedImage, fit: BoxFit.cover),
+              ),
+              const SizedBox(height: 12),
+              Text("Preview", style: GoogleFonts.poppins(fontSize: 16)),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CapturedImagePage(image: pickedImage),
+                    ),
+                  );
+                },
+                child: const Text("Continue"),
+              )
+            ],
+          ),
         ),
       );
     }
@@ -45,121 +84,147 @@ class _CameraState extends State<Camera> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple.shade100,
-      body: SingleChildScrollView(
+      backgroundColor: Colors.grey.shade50,
+      body: SafeArea(
         child: Column(
           children: [
-            PrimaryHeaderContainer(
-              color: Colors.purple,
-              child: Column(
+            const SizedBox(height: 20),
+            Center(
+              child: Text(
+                "Scanner",
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  CustomAppBar(
-                    title: Column(
-                      children: [
-                        Text(
-                          "Scanner",
-                          style: GoogleFonts.poppins(color: Colors.grey.shade200),
-                        ),
-                      ],
-                    ),
+                  _buildScannerCard(
+                    title: "Capture Image of the Kit",
+                    icon: Iconsax.camera,
+                    iconBackgroundColor: Colors.orange.shade100,
+                    buttonText: "Capture",
+                    onTap: () => _handleImagePick(_imagePickerService.captureImageFromCamera),
                   ),
-                  const SizedBox(height: 50),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: InkWell(
-                      onTap: _captureImageFromCamera,
+                  const SizedBox(height: 20),
+                  _buildScannerCard(
+                    title: "Pick Image from Gallery",
+                    icon: Iconsax.gallery,
+                    iconBackgroundColor: Colors.teal.shade100,
+                    buttonText: "Pick",
+                    onTap: () => _handleImagePick(_imagePickerService.pickImageFromGallery),
+                  ),
+                  const SizedBox(height: 20),
+                  if (_isLoading)
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
                       child: Container(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        height: MediaQuery.of(context).size.height * 0.2,
+                        height: 200,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 20, right: 20),
-                              child: Text(
-                                'Capture image \n of the kit',
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.purple,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.all(24.0),
-                              child: Icon(Iconsax.scanner4,
-                                  size: 60, color: Colors.purple),
-                            ),
-                          ],
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 90),
+                    )
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: InkWell(
-                onTap: _pickImageFromGallery,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  height: MediaQuery.of(context).size.height * 0.2,
-                  decoration: BoxDecoration(
-                    color: Colors.purple,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              child: Text(
+                "This feature is under development and will be available soon.",
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScannerCard({
+    required String title,
+    required IconData icon,
+    required Color iconBackgroundColor,
+    required String buttonText,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 20, right: 20),
-                        child: Text(
-                          'pick an image \n from gallery',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                            fontSize: 20,
-                          ),
-                        ),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    onPressed: onTap,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade100,
+                      foregroundColor: Colors.black,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(24.0),
-                        child: Icon(Iconsax.document_upload,
-                            size: 60, color: Colors.white),
-                      ),
-                    ],
+                    ),
+                    icon: const Icon(Iconsax.image),
+                    label: Text(
+                      buttonText,
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              flex: 2,
+              child: ScaleTransition(
+                scale: Tween(begin: 1.0, end: 1.1).animate(CurvedAnimation(
+                  parent: _iconPulseController,
+                  curve: Curves.easeInOut,
+                )),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: iconBackgroundColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 40,
+                    color: Colors.black87,
                   ),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text("This feature is still in the development phase and is yet to be implemented.",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),textAlign: TextAlign.center,),
-            )
           ],
         ),
       ),
@@ -167,8 +232,6 @@ class _CameraState extends State<Camera> {
   }
 }
 
-
-// ImagePickerService class to handle image picking from gallery and camera
 class ImagePickerService {
   final ImagePicker _picker = ImagePicker();
 

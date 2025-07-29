@@ -195,10 +195,9 @@ import '../secrets.dart';
               backgroundColor: Colors.grey.shade100,
               appBar: AppBar(
                 automaticallyImplyLeading: false,
-                leading: IconButton(onPressed: () => Get.back(), icon: Icon(Icons.arrow_back, color: Colors.white,)),
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.white,
                 title: Text('Loading...',
-                    style: GoogleFonts.poppins(color: Colors.white)),
+                    style: GoogleFonts.poppins(color: Colors.black)),
               ),
               body: const Center(child: CircularProgressIndicator()),
             );
@@ -209,8 +208,7 @@ import '../secrets.dart';
               backgroundColor: Colors.grey.shade100,
               appBar: AppBar(
                 automaticallyImplyLeading: false,
-                leading: IconButton(onPressed: () => Get.back(), icon: Icon(Icons.arrow_back, color: Colors.white,)),
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.white,
                 title: Text('Error',
                     style: GoogleFonts.poppins(color: Colors.white)),
               ),
@@ -236,10 +234,9 @@ import '../secrets.dart';
                   backgroundColor: Colors.grey.shade100,
                   appBar: AppBar(
                     automaticallyImplyLeading: false,
-                    leading: IconButton(onPressed: () => Get.back(), icon: Icon(Icons.arrow_back, color: Colors.white,)),
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.white,
                     title: Text('Loading user...',
-                        style: GoogleFonts.poppins(color: Colors.white)),
+                        style: GoogleFonts.poppins(color: Colors.black)),
                   ),
                   body: const Center(child: CircularProgressIndicator()),
                 );
@@ -252,8 +249,8 @@ import '../secrets.dart';
                   backgroundColor: Colors.grey.shade100,
                   appBar: AppBar(
                     automaticallyImplyLeading: false,
-                    leading: IconButton(onPressed: () => Get.back(), icon: Icon(Icons.arrow_back, color: Colors.white,)),
-                    backgroundColor: Colors.green,
+                    leading: IconButton(onPressed: () => Get.back(), icon: Icon(Icons.arrow_back, color: Colors.black,)),
+                    backgroundColor: Colors.white,
                     title: Text('Error',
                         style: GoogleFonts.poppins(color: Colors.white)),
                   ),
@@ -264,16 +261,17 @@ import '../secrets.dart';
               final userData = userSnapshot.data!.data() as Map<String, dynamic>;
               final otherUserName = userData['name'] ?? 'Unknown User';
               final otherUserPlayerId = userData['onesignalPlayerId'];
+              final otherUserPhotoUrl = userData['photoUrl'] ?? '';
 
               return Scaffold(
                 backgroundColor: Colors.grey.shade100,
                 appBar: AppBar(
                   automaticallyImplyLeading: false,
-                  leading: IconButton(onPressed: () => Get.back(), icon: Icon(Icons.arrow_back, color: Colors.white,)),
-                  backgroundColor: Colors.green,
+                  leading: IconButton(onPressed: () => Get.back(), icon: Icon(Icons.arrow_back, color: Colors.black,)),
+                  backgroundColor: Colors.white,
                   title: Text(
                     otherUserName,
-                    style: GoogleFonts.poppins(color: Colors.white),
+                    style: GoogleFonts.poppins(color: Colors.black),
                   ),
                   actions: [
                     // IconButton(
@@ -285,7 +283,8 @@ import '../secrets.dart';
                       onPressed: () {
                         _showTextInputDialog(context, otherUserId);
                       },
-                      icon: Icon(Icons.video_call, color: Colors.white),
+                      icon: Icon(Icons.video_call, color: Colors.black
+                      ),
                     ),
                   ],
 
@@ -319,74 +318,114 @@ import '../secrets.dart';
                               final formattedTime = dateTime != null
                                   ? DateFormat('dd MMM yyyy, hh:mm a')
                                       .format(dateTime)
-                                  : 'No timestamp';
+                                  : '🕒';
                               final isCurrentUser =
                                   message['senderId'] == currentUserId;
 
                               return Align(
-                                alignment: isCurrentUser
-                                    ? Alignment.centerRight
-                                    : Alignment.centerLeft,
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: 4.0, horizontal: 8.0),
-                                  padding: const EdgeInsets.all(12.0),
-                                  decoration: BoxDecoration(
-                                    color: isCurrentUser
-                                        ? Colors.green.shade100
-                                        : Colors.blue.shade100,
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: const Radius.circular(12.0),
-                                      topRight: const Radius.circular(12.0),
-                                      bottomLeft: isCurrentUser
-                                          ? const Radius.circular(12.0)
-                                          : const Radius.circular(0),
-                                      bottomRight: isCurrentUser
-                                          ? const Radius.circular(0)
-                                          : const Radius.circular(12.0),
-                                    ),
-                                  ),
-                                  child: Column(
+                                alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                    isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(message['text'],
-                                          style:
-                                              GoogleFonts.poppins(fontSize: 15)),
-                                      const SizedBox(height: 4.0),
-                                      Text(formattedTime,
-                                          style:
-                                              GoogleFonts.poppins(fontSize: 12)),
+                                      if (!isCurrentUser) ...[
+                                        CircleAvatar(
+                                          radius: 18,
+                                          backgroundImage: NetworkImage(otherUserPhotoUrl),
+                                        ),
+                                        const SizedBox(width: 8),
+                                      ],
+                                      Flexible(
+                                        child: Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: isCurrentUser
+                                                ? const Color(0xFFD1FADF) // light green
+                                                : const Color(0xFFF2F4F7), // light grey
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: const Radius.circular(12),
+                                              topRight: const Radius.circular(12),
+                                              bottomLeft: Radius.circular(isCurrentUser ? 12 : 0),
+                                              bottomRight: Radius.circular(isCurrentUser ? 0 : 12),
+                                            ),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                message['text'],
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 14,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 6),
+                                              Text(
+                                                formattedTime,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 11,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                               );
+
                             },
                           );
                         },
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.only(bottom: 25, left: 15),
                       child: Row(
                         children: [
                           Expanded(
-                            child: TextField(
-                              controller: messageController,
-                              decoration: InputDecoration(
-                                hintText: 'Type a message...',
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  borderSide: const BorderSide(
-                                      color: Colors.grey, width: 1.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  borderSide: const BorderSide(
-                                      color: Colors.grey, width: 2.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 12,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: TextField(
+                                controller: messageController,
+                                cursorColor: Colors.green.shade400,
+                                style: GoogleFonts.poppins(fontSize: 14),
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  hintText: "Type a message...",
+                                  hintStyle: GoogleFonts.poppins(
+                                    color: Colors.grey.shade500,
+                                    fontSize: 14,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: BorderSide(color: Colors.green.shade300, width: 1.5),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
+
                           IconButton(
                             icon: const Icon(Icons.send),
                             onPressed: () async {

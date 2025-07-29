@@ -16,15 +16,15 @@ class RiskScoreWidget extends StatelessWidget {
     String riskLevel;
     String riskExplanation;
 
-    if (clampedScore == 0) {
+    if (clampedScore == 1) {
       riskColor = Colors.green;
       riskLevel = 'Low';
       riskExplanation = 'You have a low risk. Keep up the healthy habits!';
-    } else if (clampedScore == 1) {
+    } else if (clampedScore == 2) {
       riskColor = Colors.amber;
       riskLevel = 'Moderate';
       riskExplanation = 'Your risk is moderate. Consider mild lifestyle changes.';
-    } else if (clampedScore == 2) {
+    } else if (clampedScore == 3) {
       riskColor = Colors.orange;
       riskLevel = 'High';
       riskExplanation = 'High risk detected. A doctor consultation is advised.';

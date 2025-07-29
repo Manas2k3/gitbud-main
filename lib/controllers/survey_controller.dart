@@ -15,25 +15,22 @@
     var totalScore = 0.obs;
 
     // Method to select an answer and calculate the score
-    void selectAnswer(int questionIndex, int selectedOption, SurveyQuestion question) {
-      int marks = selectedOption + 1; // Option 0 = 1 mark, Option 1 = 2 marks, etc.
-
+    void selectAnswer(int questionIndex, int marks, SurveyQuestion question) {
       SurveyResponse response = SurveyResponse(
         marks: marks,
         resultCategory: question.stringResourceId,
         stringResourceId: question.resultCategory.hashCode,
       );
 
-      // Update response or add a new one
       if (questionResponses.length > questionIndex) {
         questionResponses[questionIndex] = response;
       } else {
         questionResponses.add(response);
       }
 
-      // Update total score
       totalScore.value = questionResponses.fold(0, (sum, item) => sum + item.marks);
     }
+
 
     // Method to submit the survey
     Future<void> submitSurvey(BuildContext context) async {

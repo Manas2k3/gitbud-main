@@ -33,7 +33,7 @@ class TongueAnalysisController extends GetxController {
     }
 
     FullScreenLoader.openLoadingDialog(
-      "Processing your details...",
+      "Analysing tongue image...",
       AnimationStrings.loadingAnimation,
       onCancel: () {
         isLoading.value = false;
@@ -49,7 +49,7 @@ class TongueAnalysisController extends GetxController {
     try {
       isLoading.value = true;
 
-      final uri = Uri.parse("https://01f6dbfbfd18.ngrok-free.app/predict");
+      final uri = Uri.parse("https://tongue-analysis.onrender.com/predict");
       final request = http.MultipartRequest("POST", uri);
 
       final mimeType = lookupMimeType(imageFile.path);

@@ -14,7 +14,7 @@ class FirestoreService {
 
       print("Dieticians fetched: ${querySnapshot.docs.length}");
       return querySnapshot.docs
-          .map((doc) => ChatModel.fromMap(doc.data() as Map<String, dynamic>))
+          .map((doc) => ChatModel.fromMap(doc.data()))
           .toList();
     } catch (e) {
       print("Error fetching dieticians: $e");

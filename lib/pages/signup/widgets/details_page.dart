@@ -110,126 +110,13 @@ class _DetailsPageState extends State<DetailsPage> {
                     ),
                   ),
 
-                  // Age Field
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Theme(
-                      data: Theme.of(context).copyWith(
-                        textSelectionTheme: const TextSelectionThemeData(
-                          selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
-                        ),
-                      ),
-                      child: TextFormField(
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        cursorColor: Colors.black,
-                        controller: controller.age,
-                        decoration: InputDecoration(
-                          labelText: 'Age',
-                          labelStyle: GoogleFonts.poppins(
-                            color: Colors.grey.shade800,
-                          ),
-                          enabledBorder: _outlineInputBorder(),
-                          focusedBorder: _outlineInputBorder(),
-                          border: _outlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: ageValidator,
-                      ),
-                    ),
-                  ),
 
-                  // Height and Weight Fields
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Theme(
-                            data: Theme.of(context).copyWith(
-                              textSelectionTheme: const TextSelectionThemeData(
-                                selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
-                              ),
-                            ),
-                            child: TextFormField(
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
-                              cursorColor: Colors.black,
-                              controller: controller.height,
-                              decoration: InputDecoration(
-                                labelText: 'Height (cm)',
-                                labelStyle: GoogleFonts.poppins(
-                                  color: Colors.grey.shade800,
-                                ),
-                                enabledBorder: _outlineInputBorder(),
-                                focusedBorder: _outlineInputBorder(),
-                                border: _outlineInputBorder(),
-                              ),
-                              keyboardType: TextInputType.number,
-                              validator: heightValidator,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16), // Spacing between the fields
-                        Expanded(
-                          child: Theme(
-                            data: Theme.of(context).copyWith(
-                              textSelectionTheme: const TextSelectionThemeData(
-                                selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
-                              ),
-                            ),
-                            child: TextFormField(
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
-                              cursorColor: Colors.black,
-                              controller: controller.weight,
-                              decoration: InputDecoration(
-                                labelText: 'Weight (kg)',
-                                labelStyle: GoogleFonts.poppins(
-                                  color: Colors.grey.shade800,
-                                ),
-                                enabledBorder: _outlineInputBorder(),
-                                focusedBorder: _outlineInputBorder(),
-                                border: _outlineInputBorder(),
-                              ),
-                              keyboardType: TextInputType.number,
-                              validator: weightValidator,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
 
                   ///Role Section
                   _buildRoleSelection(),
 
                   /// Gender Dropdown
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: DropdownButtonFormField<String>(
-                      value: controller.gender.value.isNotEmpty ? controller.gender.value : null,
-                      decoration: InputDecoration(
-                        labelText: 'Gender',
-                        labelStyle: GoogleFonts.poppins(
-                          color: Colors.grey.shade800,
-                        ),
-                        enabledBorder: _outlineInputBorder(),
-                        focusedBorder: _outlineInputBorder(),
-                        border: _outlineInputBorder(),
-                      ),
-                      items: ['Male', 'Female', 'Other']
-                          .map((value) => DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value, style: GoogleFonts.poppins()),
-                      ))
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          controller.gender.value = value;  // Directly update the RxString
-                        }
-                      },
-                    ),
-                  ),
 
-                  SizedBox(height: 5,),
 
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),

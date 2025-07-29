@@ -52,7 +52,7 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Text(
-              "Take a photo or upload an image of your meal",
+              "Take a photo or upload an image of your food item",
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,

@@ -57,95 +57,121 @@ class _CapturedImagePageState extends State<CapturedImagePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.purple.shade50,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.purple,
         leading: IconButton(
-          onPressed: () => Get.back(),
           icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Get.back(),
         ),
         title: Text(
           'Captured Image',
-          style: GoogleFonts.poppins(color: Colors.white),
+          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
         ),
-        backgroundColor: Colors.purple,
+        elevation: 0,
       ),
-      backgroundColor: Colors.purple.shade50,
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            Image.file(
-              widget.image,
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.5,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _submitImage,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.file(
+                  widget.image,
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  fit: BoxFit.cover,
                 ),
               ),
-              child: _isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2.5,
-                      ),
-                    )
-                  : Text(
-                      _isResultShown ? 'Result' : 'Submit',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                    ),
-            ),
-            const SizedBox(height: 20),
-            if (_severityText != null)
-              Text(
-                _severityText!,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: _severityColor,
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _submitImage,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple,
+                  elevation: 4,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                  width: 26,
+                  height: 26,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: Colors.white,
+                  ),
+                )
+                    : Text(
+                  _isResultShown ? 'View Result Again' : 'Submit for Analysis',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            // Padding(
-            //   padding: const EdgeInsets.all(16.0),
-            //   child: Container(
-            //     decoration: BoxDecoration(
-            //         color: Colors.white60,
-            //         borderRadius: BorderRadius.circular(15)),
-            //     height: 50,
-            //     width: double.infinity,
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //       children: [
-            //         Text(
-            //           'Tap here for consultation',
-            //           style: GoogleFonts.poppins(
-            //               color: Colors.grey.shade700, fontSize: 16),
-            //         ),
-            //         IconButton(
-            //           onPressed: () {},
-            //           icon: Icon(Icons.arrow_forward),
-            //         )
-            //       ],
-            //     ),
-            //   ),
-            // )
-          ],
+              const SizedBox(height: 30),
+              if (_severityText != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: _severityColor!.withOpacity(0.1),
+                    border: Border.all(color: _severityColor!, width: 1.5),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, size: 40),
+                      const SizedBox(height: 10),
+                      Text(
+                        _severityText!,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: _severityColor!,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  // TODO: Add your consultation logic here
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Tap here for consultation',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios_rounded, size: 18),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
+
 }

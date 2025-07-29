@@ -4,108 +4,158 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'individual_chat_page.dart';
 import '../services/firestore_service.dart';
+import 'package:intl/intl.dart';
 
 class DieticianChatListPage extends StatelessWidget {
   final String dieticianId;
 
   const DieticianChatListPage({
     Key? key,
-    required this.dieticianId, required String currentUserId,
+    required this.dieticianId,
+    required String currentUserId,
   }) : super(key: key);
 
-  // Fetch user name from Firestore
-  Future<String> fetchUserName(String userId) async {
+  Future<Map<String, dynamic>> fetchUserData(String userId) async {
     try {
-      print("Fetching user name for: $userId"); // Debugging
-
       final userDoc = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
-
-      if (!userDoc.exists || userDoc.data() == null) {
-        print("User $userId not found in Firestore.");
-        return 'Unknown User';
-      }
-
-      final name = userDoc.data()!['name'] ?? 'Unknown User';
-      print("Fetched name: $name");
-      return name;
+      if (!userDoc.exists || userDoc.data() == null) return {};
+      return userDoc.data()!;
     } catch (e) {
-      print("Error fetching user name: $e");
-      return 'Unknown User';
+      print("Error fetching user data: $e");
+      return {};
+    }
+  }
+
+  String formatTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) return '';
+    final now = DateTime.now();
+    final messageTime = timestamp.toDate();
+    final difference = now.difference(messageTime);
+
+    if (difference.inDays == 0) {
+      return DateFormat('hh:mm a').format(messageTime);
+    } else if (difference.inDays == 1) {
+      return 'Yesterday';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else {
+      return '1 week ago';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
         leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Get.back(),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),
-        backgroundColor: Colors.green,
         title: Text(
-          'Chats with Users',
-          style: GoogleFonts.poppins(color: Colors.white),
+          'Chat with Users',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: Colors.black,
+          ),
         ),
       ),
       body: StreamBuilder<List<DocumentSnapshot>>(
         stream: FirestoreService().fetchChatsForDietician(dieticianId),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            print("Error fetching chats: ${snapshot.error}");
-            return const Center(child: Text('Error loading chats.'));
-          }
+          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (snapshot.hasError) return const Center(child: Text('Error loading chats.'));
 
           final chats = snapshot.data ?? [];
-          print("Chats Fetched: ${chats.length}");
-
-          if (chats.isEmpty) {
-            return const Center(child: Text('No chats found.'));
-          }
+          if (chats.isEmpty) return const Center(child: Text('No chats found.'));
 
           return ListView.builder(
             itemCount: chats.length,
             itemBuilder: (context, index) {
               final chat = chats[index];
-
               final participants = List<String>.from(chat['participants']);
-              print("Chat ID: ${chat.id}, Participants: $participants");
-
-              // Get the other user's ID
               final otherUserId = participants.firstWhere(
                     (id) => id != dieticianId,
-                orElse: () => 'NoOtherUser', // Fallback if only one participant exists
+                orElse: () => 'NoOtherUser',
               );
 
-              print("Other User ID: $otherUserId");
-
-              return FutureBuilder<String>(
-                future: fetchUserName(otherUserId),
-                builder: (context, nameSnapshot) {
-                  if (nameSnapshot.connectionState == ConnectionState.waiting) {
+              return FutureBuilder<Map<String, dynamic>>(
+                future: fetchUserData(otherUserId),
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
                     return const ListTile(title: Text('Loading...'));
                   }
 
-                  final userName = nameSnapshot.data ?? 'Unknown User';
+                  final userData = userSnapshot.data ?? {};
+                  final name = userData['name'] ?? 'Unknown User';
+                  final photoUrl = userData['photoUrl'] ??
+                      'https://i.pinimg.com/474x/e6/e4/df/e6e4df26ba752161b9fc6a17321fa286.jpg';
+                  final lastMessage = chat['lastMessage'] ?? '';
 
-                  return ListTile(
-                    title: Text(userName, style: GoogleFonts.poppins()),
-                    subtitle: Text(chat['lastMessage'] ?? '', style: GoogleFonts.poppins()),
+                  final data = chat.data() as Map<String, dynamic>;
+                  final timestamp = data.containsKey('lastMessageTime')
+                      ? data['lastMessageTime'] as Timestamp
+                      : null;
+
+
+                  return InkWell(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => IndividualChatPage(
-                            chatId: chat.id,
-                          ),
+                          builder: (context) => IndividualChatPage(chatId: chat.id),
                         ),
                       );
                     },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundImage: NetworkImage(photoUrl),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '$name',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  lastMessage,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            formatTimestamp(timestamp),
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ),
                   );
                 },
               );

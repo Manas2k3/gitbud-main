@@ -40,18 +40,18 @@ class ArticleSearchDelegate extends SearchDelegate<String> {
 
   @override
   List<Widget> buildActions(BuildContext context) => [
-    if (query.isNotEmpty)
-      IconButton(
-        icon: const Icon(Icons.clear),
-        onPressed: () => query = '',
-      ),
-  ];
+        if (query.isNotEmpty)
+          IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () => query = '',
+          ),
+      ];
 
   @override
   Widget buildLeading(BuildContext context) => IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () => close(context, ''),
-  );
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => close(context, ''),
+      );
 
   @override
   Widget buildResults(BuildContext context) => Container();
@@ -60,7 +60,7 @@ class ArticleSearchDelegate extends SearchDelegate<String> {
   Widget buildSuggestions(BuildContext context) {
     final suggestions = articles
         .where((article) =>
-        article.title.toLowerCase().contains(query.toLowerCase()))
+            article.title.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
     return ListView.builder(
@@ -86,7 +86,6 @@ class ArticleSearchDelegate extends SearchDelegate<String> {
 }
 
 class _HomePageState extends State<HomePage> {
-
   final List<Map<String, dynamic>> dynamicCards = [
     {
       'title': 'Take a quick \n Gi-Bud Gut Test!',
@@ -94,12 +93,12 @@ class _HomePageState extends State<HomePage> {
       'navigateTo': GutTestScreen(),
     },
     {
-      'title': 'Explore Personalized \nHealth Insights for Kids',
+      'title': 'Unlock Kids Health Insights',
       'image': ImageStrings.kidImage,
       'navigateTo': KidsSection(),
     },
     {
-      'title': 'Discover Personalized Nutrition \nInsights From Your Plate',
+      'title': 'Personalized Nutrition, From Your Plate',
       'image': ImageStrings.foodSwapImage,
       'navigateTo': FoodSwapImageUploadPage(),
     },
@@ -113,7 +112,8 @@ class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Logger logger = Logger();
 
-  final PageController _cardPageController = PageController(viewportFraction: 0.85);
+  final PageController _cardPageController =
+      PageController(viewportFraction: 0.85);
   int _currentCardIndex = 0;
 
   String name = 'User';
@@ -151,7 +151,10 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      final userDoc = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+      final userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .get();
 
       if (userDoc.exists) {
         final userData = userDoc.data() as Map<String, dynamic>;
@@ -179,7 +182,10 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      final userDoc = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+      final userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .get();
       if (!userDoc.exists) {
         Get.snackbar('Error', 'User data not found.',
             backgroundColor: Colors.red, colorText: Colors.white);
@@ -197,16 +203,17 @@ class _HomePageState extends State<HomePage> {
 
         if (dieticianQuery.docs.isNotEmpty) {
           final dieticianId = dieticianQuery.docs.first.id;
-          Get.to(() => ChatListPage(currentUserId: userId, dieticianId: dieticianId));
+          Get.to(() =>
+              ChatListPage(currentUserId: userId, dieticianId: dieticianId));
         } else {
           Get.snackbar('Error', 'No dietician is available.',
               backgroundColor: Colors.red, colorText: Colors.white);
         }
       } else if (selectedRole == 'dietician') {
         Get.to(() => DieticianChatListPage(
-          currentUserId: userId,
-          dieticianId: userId,
-        ));
+              currentUserId: userId,
+              dieticianId: userId,
+            ));
       }
     } catch (e) {
       Get.snackbar('Error', 'An error occurred: $e',
@@ -216,42 +223,104 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.blue.shade100,
+      appBar: AppBar(
+        backgroundColor: Colors.blue.shade50,
+        automaticallyImplyLeading: false,
+        title: Text(
+          "Hey ${name.split(' ').first},",
+          style: GoogleFonts.poppins(
+            color: Colors.black87,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        actions: [
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.search,
+                    size: 26, color: Colors.black87),
+                onPressed: () => showSearch(
+                  context: context,
+                  delegate: ArticleSearchDelegate(articleList),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.message,
+                    size: 26, color: Colors.black87),
+                onPressed: _handleMessageTap,
+              ),
+            ],
+          ),
+        ],
+      ),
+      backgroundColor: Colors.blue.shade50,
       body: isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.blue,))
+          ? const Center(
+              child: CircularProgressIndicator(color: Colors.blue),
+            )
           : SingleChildScrollView(
-        child: Column(
-          children: [
-            PrimaryHeaderContainer(
-              color: Colors.blue,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CustomAppBar(
-                    title: Text(
-                      "Hey $name,",
-                      style: GoogleFonts.poppins(
-                          color: Colors.grey.shade200, fontSize: 18),
+                  // --- Dynamic Cards (Features) as Horizontal Carousel ---
+                  // --- Articles Section (Horizontal Carousel Slider) ---
+                  Text(
+                    "Recommended Articles",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
                     ),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.search, size: 30, color: Colors.white),
-                        onPressed: () => showSearch(
-                          context: context,
-                          delegate: ArticleSearchDelegate(articleList),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.message, size: 30, color: Colors.white),
-                        onPressed: _handleMessageTap,
-                      ),
-                    ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
-                  // Modified carousel section
                   SizedBox(
-                    height: 180,
+                    height: 260,
+                    child: articleList.isNotEmpty
+                        ? CarouselSlider.builder(
+                      itemCount: articleList.length,
+                      itemBuilder: (context, index, realIndex) {
+                        final article = articleList[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.65,
+                            child: CustomRoundedImageWidget(
+                              article: article,
+                              title: article.title,
+                            ),
+                          ),
+                        );
+                      },
+                      options: CarouselOptions(
+                        height: MediaQuery.of(context).size.height*0.6,
+                        enlargeCenterPage: true,
+                        viewportFraction: 0.7, // Ensures one card per swipe, slight preview of next
+                        autoPlay: true,
+                        autoPlayInterval: const Duration(seconds: 3),
+                        autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                        enableInfiniteScroll: true,
+                        scrollPhysics: const BouncingScrollPhysics(),
+                      ),
+                    )
+                        : const Center(child: Text('No articles available')),
+                  ),
+                  const SizedBox(height: 25),
+
+                  Text(
+                    "Explore",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height*0.04),
+                  SizedBox(
+                    height: screenHeight * 0.25, // Increased height
                     child: PageView.builder(
                       controller: _cardPageController,
                       itemCount: dynamicCards.length,
@@ -263,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         final card = dynamicCards[index];
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
                           child: DynamicCard(
                             title: card['title'],
                             image: card['image'],
@@ -273,55 +342,32 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  AnimatedSmoothIndicator(
-                    activeIndex: _currentCardIndex,
-                    count: dynamicCards.length,
-                    effect: ExpandingDotsEffect(
-                      dotHeight: 8,
-                      dotWidth: 8,
-                      activeDotColor: Colors.white,
-                      dotColor: Colors.grey.shade300,
+                  const SizedBox(height: 8),
+                  Center(
+                    child: AnimatedSmoothIndicator(
+                      activeIndex: _currentCardIndex,
+                      count: dynamicCards.length,
+                      effect: ExpandingDotsEffect(
+                        dotHeight: 6,
+                        dotWidth: 6,
+                        activeDotColor: Colors.blue,
+                        dotColor: Colors.grey.shade400,
+                      ),
+                      onDotClicked: (index) {
+                        _cardPageController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
                     ),
-                    onDotClicked: (index) {
-                      _cardPageController.animateToPage(
-                        index,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    },
                   ),
-                  const SizedBox(height: 32),
+
+
+
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
-              child: Center(
-                child: articleList.isNotEmpty
-                    ? CarouselSlider.builder(
-                  itemCount: articleList.length,
-                  itemBuilder: (context, index, realIndex) {
-                    final article = articleList[index];
-                    return CustomRoundedImageWidget(
-                      article: article,
-                      title: article.title,
-                    );
-                  },
-                  options: CarouselOptions(
-                    aspectRatio: 16 / 9,
-                    height: MediaQuery.of(context).size.height * 0.39,
-                    autoPlay: true,
-                    autoPlayInterval: const Duration(seconds: 4),
-                    enlargeCenterPage: true,
-                  ),
-                )
-                    : const Text('No articles available'),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

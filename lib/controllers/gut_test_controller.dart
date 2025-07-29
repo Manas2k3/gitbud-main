@@ -9,6 +9,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../data/repositories/survey/survey_questions.dart';
 import '../secrets.dart';
+import '../survey/model/survey_model.dart';
 import '../survey/survey_screen.dart';
 import '../utils/popups/full_screen.dart';
 import '../utils/popups/loaders.dart';
@@ -39,52 +40,42 @@ class GutTestController extends GetxController {
   void openCheckout(double amount) async {
     var options = {
       'key': key,
-      'amount': amount * 100, // Amount in paise
+      'amount': amount * 100,
       'name': 'GiBud Gut Health Test',
       'description': 'Payment for Gut Health Test',
       'prefill': {'email': FirebaseAuth.instance.currentUser!.email},
     };
     try {
-      FullScreenLoader.openLoadingDialog(
-          "We are proceeding to the payment", AnimationStrings.loadingAnimation);
+      FullScreenLoader.openLoadingDialog("We are proceeding to the payment", AnimationStrings.loadingAnimation);
       _razorpay.open(options);
     } catch (e) {
       FullScreenLoader.stopLoading();
-      Loaders.errorSnackBar(
-          title: "Error", message: "Unable to open Razorpay.");
+      Loaders.errorSnackBar(title: "Error", message: "Unable to open Razorpay.");
     }
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    FullScreenLoader.openLoadingDialog(
-      "Completing your transaction",
-      AnimationStrings.loadingAnimation,
-    );
-
+    FullScreenLoader.openLoadingDialog("Completing your transaction", AnimationStrings.loadingAnimation);
     try {
-      await _firestore.collection('Users').doc(userId).update({
-        'gutTestPaymentStatus': true,
-      });
-
+      await _firestore.collection('Users').doc(userId).update({'gutTestPaymentStatus': true});
       FullScreenLoader.stopLoading();
 
-      // Ensure the context is valid and navigation happens smoothly
+      final filteredQuestions = surveyQuestions.where((q) {
+        return !(q.stringResourceId == 2131820790 && gender != 'Female');
+      }).toList();
+
       if (Get.context != null) {
-        await _submitSurvey(Get.context!);
+        await _submitSurvey(Get.context!, filteredQuestions);
       } else {
-        // Fallback in case context is null
         Get.off(() => SurveyResultScreen(
           responses: selectedResponses,
           calculatedTotalScore: surveyController.totalScore.value,
-          resultCategory: null,
+          questions: filteredQuestions,
         ));
       }
     } catch (e) {
       FullScreenLoader.stopLoading();
-      Loaders.errorSnackBar(
-        title: "Error",
-        message: "Failed to complete payment process.",
-      );
+      Loaders.errorSnackBar(title: "Error", message: "Failed to complete payment process.");
     }
   }
 
@@ -94,21 +85,14 @@ class GutTestController extends GetxController {
       title: Text("Payment Failed"),
       content: Text("Something went wrong. Please try again."),
       actions: [
-        TextButton(
-            onPressed: () {
-              Get.back(); // Dismiss the dialog and return to the previous screen
-            },
-            child: Text("OK"))
+        TextButton(onPressed: () => Get.back(), child: Text("OK"))
       ],
     ));
   }
 
-  Future<void> _submitSurvey(BuildContext context) async {
+  Future<void> _submitSurvey(BuildContext context, List<SurveyQuestion> filteredQuestions) async {
     try {
-      FullScreenLoader.openLoadingDialog(
-        "Submitting your survey...",
-        AnimationStrings.loadingAnimation,
-      );
+      FullScreenLoader.openLoadingDialog("Submitting your survey...", AnimationStrings.loadingAnimation);
 
       final isConnected = await InternetConnectionChecker().hasConnection;
       if (!isConnected) {
@@ -117,55 +101,34 @@ class GutTestController extends GetxController {
         return;
       }
 
-      // Calculate the number of questions the user is expected to answer
-      int requiredResponsesCount = surveyQuestions.where((question) {
-        // Exclude questions based on gender if applicable
-        return !(question.stringResourceId == 2131820790 && gender != 'Female');
-      }).length;
-
+      final requiredResponsesCount = filteredQuestions.length;
       if (selectedResponses.length == requiredResponsesCount) {
         await surveyController.submitSurvey(context);
-
         FullScreenLoader.stopLoading();
         Loaders.successSnackBar(
-          title: 'Response Recorded',
-          message: 'Your responses have been recorded successfully!',
-        );
+            title: 'Response Recorded',
+            message: 'Your responses have been recorded successfully!');
 
-        Get.to(SurveyResultScreen(
+        Get.to(() => SurveyResultScreen(
           responses: selectedResponses,
           calculatedTotalScore: surveyController.totalScore.value,
-          resultCategory: null,
+          questions: filteredQuestions,
         ));
       } else {
         FullScreenLoader.stopLoading();
-        Loaders.warningSnackBar(
-          title: 'Please answer all questions',
-          message: "",
-        );
+        Loaders.warningSnackBar(title: 'Please answer all questions', message: "");
       }
     } catch (e) {
       FullScreenLoader.stopLoading();
-      Get.snackbar(
-        "Error",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar("Error", e.toString(), snackPosition: SnackPosition.BOTTOM);
     }
   }
 
   void _showNoInternetDialog(BuildContext context) {
-    Get.dialog(
-      AlertDialog(
-        title: Text("No Internet Connection"),
-        content: Text("Please check your internet connection and try again."),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text("OK"),
-          )
-        ],
-      ),
-    );
+    Get.dialog(AlertDialog(
+      title: Text("No Internet Connection"),
+      content: Text("Please check your internet connection and try again."),
+      actions: [TextButton(onPressed: () => Get.back(), child: Text("OK"))],
+    ));
   }
 }

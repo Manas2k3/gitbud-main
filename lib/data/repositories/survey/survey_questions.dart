@@ -11,6 +11,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Tobacco Use",
     stringResourceId: 2131820779,
+    imageAsset: 'assets/images/surveyQuestionImages/1.png',
   ),
   SurveyQuestion(
     question: "On a scale of 0–3, how would you describe your alcohol consumption (weekly)?",
@@ -22,6 +23,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Alcohol Use",
     stringResourceId: 2131820780,
+    imageAsset: 'assets/images/surveyQuestionImages/2.png',
   ),
   SurveyQuestion(
     question: "On a scale of 0–3, how severely have you experienced anxiety or depression symptoms related to digestive health?",
@@ -33,6 +35,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Anxiety, depression",
     stringResourceId: 2131820781,
+    imageAsset: 'assets/images/surveyQuestionImages/3.png',
   ),
   SurveyQuestion(
     question: "On a scale of 0–3, how significant is your family history of health conditions (e.g., diabetes, high blood pressure)?",
@@ -44,6 +47,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Family History",
     stringResourceId: 2131820782,
+    imageAsset: 'assets/images/surveyQuestionImages/4.png',
   ),
   SurveyQuestion(
     question: "How many times have you felt bloated during the past week?",
@@ -55,6 +59,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Bloating",
     stringResourceId: 2131820783,
+    imageAsset: 'assets/images/surveyQuestionImages/5.png',
   ),
   SurveyQuestion(
     question: "How many times have you been bothered by constipation during the past week?",
@@ -66,6 +71,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Constipation",
     stringResourceId: 2131820784,
+    imageAsset: 'assets/images/surveyQuestionImages/6.png',
   ),
   SurveyQuestion(
     question: "In a typical week, how often do you engage in physical activity intense enough to make you short of breath if you tried to sing?",
@@ -77,6 +83,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Physical Activity",
     stringResourceId: 2131820785,
+    imageAsset: 'assets/images/surveyQuestionImages/7.png',
   ),
   SurveyQuestion(
     question: "On a scale of 0–3, how much exposure do you have to environmental factors (pollutants or toxins) that may affect your gut health?",
@@ -88,6 +95,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Environmental Stress",
     stringResourceId: 2131820786,
+    imageAsset: 'assets/images/surveyQuestionImages/8.png',
   ),
   SurveyQuestion(
     question: "How often are you unwell (e.g., with colds or flu) in a typical week?",
@@ -99,6 +107,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Fever, nausea",
     stringResourceId: 2131820787,
+    imageAsset: 'assets/images/surveyQuestionImages/9.png',
   ),
   SurveyQuestion(
     question: "On a scale of 0–3, how often is your routine or digestion negatively affected by stress?",
@@ -110,6 +119,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Stress Levels",
     stringResourceId: 2131820788,
+    imageAsset: 'assets/images/surveyQuestionImages/10.png',
   ),
   SurveyQuestion(
     question: "On a scale of 0–3, how frequently do you take regular medication in a typical week?",
@@ -121,6 +131,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Medication Stress",
     stringResourceId: 2131820789,
+    imageAsset: 'assets/images/surveyQuestionImages/11.png',
   ),
   SurveyQuestion(
     question: "On a scale of 0–3, how often do you experience digestive symptoms before your period (e.g., bloating, constipation, diarrhea)?",
@@ -132,6 +143,7 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Digestive Issues",
     stringResourceId: 2131820790,
+    imageAsset: 'assets/images/surveyQuestionImages/12.png',
   ),
   SurveyQuestion(
     question: "How many medical conditions have you been formally diagnosed with by a doctor?",
@@ -143,6 +155,6 @@ List<SurveyQuestion> surveyQuestions = [
     },
     resultCategory: "Diagnosed Conditions",
     stringResourceId: 2131820791,
+    imageAsset: 'assets/images/surveyQuestionImages/13.png',
   ),
 ];
-

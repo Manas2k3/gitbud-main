@@ -69,76 +69,92 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Phone Number Field
-                    TextFormField(
-                      cursorColor: Colors.black,
-                      controller: controller.emailController,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Iconsax.message),
-                        labelText: 'Email',
-                        labelStyle: GoogleFonts.poppins(color: Colors.grey.shade800),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: Colors.black),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    Theme(
+                      data: Theme.of(context).copyWith(
+                        textSelectionTheme: const TextSelectionThemeData(
+                          selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                         ),
                       ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Email is required';
-                        }
-                        if (!GetUtils.isEmail(value)) {
-                          return 'Enter a valid email';
-                        }
-                        return null;
-                      },
+                      child: TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        cursorColor: Colors.black,
+                        controller: controller.emailController,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Iconsax.message),
+                          labelText: 'Email',
+                          labelStyle: GoogleFonts.poppins(color: Colors.grey.shade800),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.black),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.black),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Email is required';
+                          }
+                          if (!GetUtils.isEmail(value)) {
+                            return 'Enter a valid email';
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                     SizedBox(height: 25),
 
                     // Password Field
-                    TextFormField(
-                      controller: controller.passwordController,
-                      cursorColor: Colors.black,
-                      obscureText: _obscureText,
-                      decoration: InputDecoration(
-                        floatingLabelStyle: TextStyle(color: Colors.black),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.black)
-                        ),
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureText ? Icons.visibility : Icons.visibility_off,
-                            color: Colors.redAccent,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
-                        ),
-                        labelText: 'Password',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    Theme(
+                      data: Theme.of(context).copyWith(
+                        textSelectionTheme: const TextSelectionThemeData(
+                          selectionHandleColor: Colors.redAccent, // 👈 Change this to your desired color
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
+                      child: TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        controller: controller.passwordController,
+                        cursorColor: Colors.black,
+                        obscureText: _obscureText,
+                        decoration: InputDecoration(
+                          floatingLabelStyle: TextStyle(color: Colors.black),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.black),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.black)
+                          ),
+                          prefixIcon: Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText ? Icons.visibility : Icons.visibility_off,
+                              color: Colors.redAccent,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                          ),
+                          labelText: 'Password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.length < 6) {
+                            return 'Password must be at least 6 characters';
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Column(

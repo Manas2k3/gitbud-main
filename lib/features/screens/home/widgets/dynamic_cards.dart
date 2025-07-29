@@ -31,7 +31,7 @@ class DynamicCard extends StatelessWidget {
           Get.to(() => navigateTo);
         },
         child: Container(
-          width: screenWidth * 0.9,
+          width: screenWidth * 1.2,
           height: screenHeight * 0.2,
           decoration: BoxDecoration(
             color: Colors.white,

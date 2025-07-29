@@ -30,6 +30,7 @@ class VerifyMail extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               /// Image
               Image.asset(ImageStrings.verifyEmail),
@@ -42,28 +43,37 @@ class VerifyMail extends StatelessWidget {
                     fontSize: 24, fontWeight: FontWeight.w600),
               ),
 
-              SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               Text(
-                'Your account has been created sucessfully, please do verify your email to proceed ahead',
+                'Your account has been created successfully. Please verify your email to proceed ahead.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(),
               ),
-              SizedBox(height: 25),
 
+              const SizedBox(height: 25),
+
+              /// Email Display
               Column(
                 children: [
-                  Text('Mail has been sent to '),
-                  Text('$email', style: GoogleFonts.poppins(color: Colors.blue, fontSize: 18),)
+                  Text('Mail has been sent to', style: GoogleFonts.poppins()),
+                  Text(
+                    '$email',
+                    style: GoogleFonts.poppins(
+                        color: Colors.blue, fontSize: 18),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'If you don’t see the email, please check your spam or junk folder.',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                        fontSize: 13, color: Colors.red.shade700),
+                  ),
                 ],
               ),
-              /// Buttons (you can add your buttons here)
 
-              // CustomButton(color: Colors.redAccent,buttonText: 'Continue', onTap: () => controller.checkEmailVerificationStatus()),
+              const SizedBox(height: 30),
 
-              SizedBox(height: 10),
-
+              /// Resend Button
               TextButton(
                 onPressed: () => controller.sendEmailVerification(),
                 child: Text(

@@ -11,6 +11,13 @@ import '../../utils/popups/full_screen.dart';
 import '../features/screens/food_swap/food_swap_result_screen.dart';
 
 class FoodSwapController extends GetxController {
+
+  void _showLoader() {
+    FullScreenLoader.openLoadingDialog(
+      "Analyzing your meal...",
+      AnimationStrings.loadingAnimation,
+    );
+  }
   static FoodSwapController get instance => Get.find();
 
   final Rxn<File> selectedImage = Rxn<File>();
@@ -68,12 +75,7 @@ class FoodSwapController extends GetxController {
     }
   }
 
-  void _showLoader() {
-    FullScreenLoader.openLoadingDialog(
-      "Analyzing your meal...",
-      AnimationStrings.foodLoadingAnimation,
-    );
-  }
+
 
   void _hideLoader() {
     FullScreenLoader.stopLoading();

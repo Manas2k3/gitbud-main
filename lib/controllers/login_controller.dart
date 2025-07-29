@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gibud/navigation_menu.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import '../data/repositories/authentication/authentication_repository.dart';
 import '../utils/constants/animation_strings.dart';
 import '../utils/popups/full_screen.dart';
 import '../utils/popups/loaders.dart';
@@ -21,85 +23,109 @@ class LoginController extends GetxController {
   /// Function to handle login using Firebase Authentication
   Future<void> loginWithEmail(BuildContext context) async {
     try {
-      // Show loading dialog
+      // Show loading animation
       FullScreenLoader.openLoadingDialog(
         "Signing you in...",
         AnimationStrings.loadingAnimation,
       );
 
-      // Get user input
+      // Get input
       String email = emailController.text.trim();
       String password = passwordController.text.trim();
 
-      // Validate the form fields
-      if (!loginFormKey.currentState!.validate()) {
-        Get.back(); // Close the loading dialog
-        return;
-      }
+      // Validate form
+      if (!loginFormKey.currentState!.validate()) return;
 
-      // Authenticate user with Firebase
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      // Call the repository login function
+      final authRepo = AuthenticationRepository.instance;
+      UserCredential userCredential =
+      await authRepo.loginWithEmailandPassword(email, password);
 
       final User? user = userCredential.user;
+
       if (user != null) {
         // Fetch user data from Firestore
-        DocumentSnapshot userDoc = await _firestore
+        final doc = await FirebaseFirestore.instance
             .collection('Users')
             .doc(user.uid)
             .get();
 
-        if (userDoc.exists) {
-          // Retrieve the user data from Firestore
-          Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+        if (doc.exists) {
+          final userData = doc.data()!;
 
-          // Access user data from Firestore
-          String name = userData['name'] ?? 'No name available';
-          String phone = userData['phone'] ?? 'No phone available';
-          String gender = userData['gender'] ?? 'No gender available';
-          String email = userData['email'] ?? 'No email available';
+          print("Name: ${userData['name']}");
+          print("Phone: ${userData['phone']}");
+          print("Gender: ${userData['gender']}");
+          print("Email: ${userData['email']}");
 
-          // Print or use the fetched user data as required
-          print('Name: $name');
-          print('Phone: $phone');
-          print('Gender: $gender');
-          print('Email: $email');
-
-          // Call the function to store the OneSignal Push Subscription ID
+          // Save push subscription
           await _getPushSubscriptionIdAndStore();
 
-          // Proceed to the navigation menu after successful login and data retrieval
+          // Success!
           Loaders.successSnackBar(
             title: "Login Successful",
-            message: "Login successful and data fetched!",
+            message: "Welcome back!",
           );
           Get.offAll(() => NavigationMenu());
         } else {
-          // Handle case where user document doesn't exist
           Loaders.errorSnackBar(
-            title: 'User does not exist!',
-            message: 'Consider creating an account first',
+            title: "User Not Found",
+            message: "No user profile found. Please sign up first.",
           );
         }
-      } else {
-        throw Exception("Failed to log in.");
       }
     } on FirebaseAuthException catch (e) {
-      // Display an appropriate error message
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = 'No user found for that email.';
+          break;
+        case 'wrong-password':
+          message = 'Incorrect password. Try again.';
+          break;
+        case 'invalid-email':
+          message = 'That email address is not valid.';
+          break;
+        case 'user-disabled':
+          message = 'This account has been disabled.';
+          break;
+        default:
+          message = 'Authentication failed. ${e.message}';
+          break;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_getFirebaseAuthErrorMessage(e)),
+          content: Text(message),
           backgroundColor: Colors.redAccent,
         ),
       );
+    } on FirebaseException catch (e) {
+      Loaders.errorSnackBar(
+        title: 'Firebase Error',
+        message: e.message ?? 'An unknown Firebase error occurred.',
+      );
+    } on PlatformException catch (e) {
+      Loaders.errorSnackBar(
+        title: 'Platform Error',
+        message: e.message ?? 'Something went wrong on the platform side.',
+      );
+    } on FormatException catch (_) {
+      Loaders.errorSnackBar(
+        title: 'Invalid Format',
+        message: 'Check your input fields.',
+      );
     } catch (e) {
-      Loaders.errorSnackBar(title: 'Oops!', message: 'An error occurred');
+      Loaders.errorSnackBar(
+        title: 'Oops!',
+        message: e.toString(),
+      );
     } finally {
-      Get.back(); // Close the loading dialog
+      Get.back(); // close loading dialog
     }
   }
+
+
 
   /// Function to get OneSignal Push Subscription ID and store it in Firestore
   Future<void> _getPushSubscriptionIdAndStore() async {

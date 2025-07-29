@@ -120,11 +120,10 @@ class _SurveyReportState extends State<SurveyReport> {
 
             gender = userData?['gender'] ?? 'N/A';
 
-            age = int.tryParse(userData?['age'] ?? '0') ?? 0;
+            age = (userData?['age'] ?? 0) is int ? userData!['age'] : int.tryParse(userData!['age'].toString()) ?? 0;
+            height = (userData['height'] ?? 0.0) is double ? userData['height'] : double.tryParse(userData!['height'].toString()) ?? 0.0;
+            weight = (userData['weight'] ?? 0.0) is double ? userData['weight'] : double.tryParse(userData!['weight'].toString()) ?? 0.0;
 
-            height = double.tryParse(userData?['height'] ?? '0.0') ?? 0.0;
-
-            weight = double.tryParse(userData?['weight'] ?? '0.0') ?? 0.0;
 
             bmi = _calculateBMI(height, weight);
 

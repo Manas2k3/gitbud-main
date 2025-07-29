@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gibud/features/screens/tongue_analysis/widgets/TongueAnalysisResultPage.dart';
+import 'package:gibud/navigation_menu.dart';
 import 'package:gibud/utils/constants/image_strings.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -47,7 +48,7 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: IconButton(onPressed: () => Get.back(), icon: Icon(Icons.arrow_back)),
+        leading: IconButton(onPressed: () => Get.offAll(NavigationMenu()), icon: Icon(Icons.arrow_back)),
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(

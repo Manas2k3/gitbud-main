@@ -27,13 +27,13 @@ class Userdetailscontroller extends GetxController {
   final lastName = TextEditingController();
   final selectedRole = 'user'.obs;
   final phoneNumber = TextEditingController();
-  final age = TextEditingController();
-  final weight = TextEditingController();
-  final height = TextEditingController();
+  // final age = TextEditingController();
+  // final weight = TextEditingController();
+  // final height = TextEditingController();
 
   String combinedPhoneNumber = '';
   // Observable variables
-  var gender = ''.obs;
+  // var gender = ''.obs;
   bool isPaymentDone = false;
 
   // Form Key
@@ -46,13 +46,13 @@ class Userdetailscontroller extends GetxController {
   /// Main method to handle form submission
   void sendDetails(BuildContext context) async {
     try {
-      // Show loading dialog
+      // Show loading
       FullScreenLoader.openLoadingDialog(
         "Processing your details...",
         AnimationStrings.loadingAnimation,
       );
 
-      // Check internet connectivity
+      // Check internet
       final isConnected = await InternetConnectionChecker().hasConnection;
       if (!isConnected) {
         FullScreenLoader.stopLoading();
@@ -75,20 +75,14 @@ class Userdetailscontroller extends GetxController {
       final user = userCredential.user;
 
       if (user != null) {
-        // Send email verification
         await AuthenticationRepository.instance.sendEmailVerification();
 
-        // Save user details to Firestore
         final newUser = UserModel(
           id: user.uid,
           name: '${firstName.text.trim()} ${lastName.text.trim()}',
           email: email.text.trim(),
           phone: combinedPhoneNumber,
-          age: age.text.trim(),
-          gender: gender.value.trim(),
-          weight: weight.text.trim(),
           selectedRole: selectedRole.value.trim(),
-          height: height.text.trim(),
           gutTestPaymentStatus: isPaymentDone,
           createdAt: DateTime.now(),
         );
@@ -96,7 +90,6 @@ class Userdetailscontroller extends GetxController {
         final userRepository = Get.put(UserRepository());
         await userRepository.savedUserRecord(newUser);
 
-        // Optional: confirm saved data
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('Users')
             .doc(newUser.id)
@@ -104,11 +97,8 @@ class Userdetailscontroller extends GetxController {
 
         if (userDoc.exists) {
           print('Name fetched: ${userDoc['name'] ?? ''}');
-        } else {
-          print('User document does not exist in Firestore.');
         }
 
-        // Store OneSignal ID
         await _getPushSubscriptionIdAndStore();
 
         FullScreenLoader.stopLoading();
@@ -118,20 +108,46 @@ class Userdetailscontroller extends GetxController {
           message: "Verification email has been sent. Please verify to continue.",
         );
 
-        // Navigate to VerifyMail screen
         Get.offAll(() => VerifyMail(email: email.text.trim()));
       } else {
         throw Exception("Failed to create user.");
       }
+    } on FirebaseAuthException catch (e) {
+      FullScreenLoader.stopLoading();
+      String errorMsg;
+
+      switch (e.code) {
+        case 'email-already-in-use':
+          errorMsg = 'Email is already registered. Please use a different email.';
+          break;
+        case 'invalid-email':
+          errorMsg = 'Invalid email format. Please check your email.';
+          break;
+        case 'operation-not-allowed':
+          errorMsg = 'Email/password accounts are not enabled.';
+          break;
+        case 'weak-password':
+          errorMsg = 'Password is too weak. Please choose a stronger password.';
+          break;
+        default:
+          errorMsg = 'Authentication failed. Please try again.';
+      }
+
+      print('FirebaseAuthException: $errorMsg');
+      Loaders.errorSnackBar(
+        title: "Signup Error",
+        message: errorMsg,
+      );
     } catch (e) {
       FullScreenLoader.stopLoading();
       print('Error in sendDetails: $e');
       Loaders.errorSnackBar(
         title: "Error",
-        message: "Failed to process details. Please try again.",
+        message: "Something went wrong. Please try again.",
       );
     }
   }
+
 
 
   /// Function to get OneSignal Push Subscription ID and store it in Firestore

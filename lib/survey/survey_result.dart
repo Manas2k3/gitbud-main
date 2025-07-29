@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:animated_flip_counter/animated_flip_counter.dart';
 
 import 'package:gibud/common/components/widgets/custom_shapes/containers/primary_header_container.dart';
 import 'package:gibud/common/widgets/appbar/appbar.dart';
@@ -12,31 +15,89 @@ import '../data/repositories/survey/survey_questions.dart';
 import '../data/repositories/survey/survey_suggestions.dart';
 import 'model/survey_model.dart';
 
-int _getMarksFromResponse(SurveyQuestion question, String responseKey) {
-  final keys = question.responses.keys.toList();
+int getMarksFromResponse(SurveyQuestion question, String responseKey) {
+  final keys = question.responses.keys.map((e) => e.trim()).toList();
   final index = keys.indexOf(responseKey.trim());
   return index != -1 ? index + 1 : 0;
 }
 
-class SurveyResultScreen extends StatelessWidget {
+class SurveyResultScreen extends StatefulWidget {
   final Map<int, String> responses;
   final int calculatedTotalScore;
-  final String? surveyCategory;
-  final String? riskLevel;
+  final List<SurveyQuestion> questions;
 
   const SurveyResultScreen({
+    Key? key,
     required this.responses,
     required this.calculatedTotalScore,
-    this.surveyCategory,
-    this.riskLevel,
-    Key? key,
-    required resultCategory,
+    required this.questions,
   }) : super(key: key);
 
+  @override
+  State<SurveyResultScreen> createState() => _SurveyResultScreenState();
+}
+
+class _SurveyResultScreenState extends State<SurveyResultScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<Offset> _slideAnimation;
+  late final Animation<double> _fadeAnimation;
+
+  int _animatedScore = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+    _fadeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+    _controller.forward();
+
+    // Gradual counter animation
+    Future.delayed(const Duration(milliseconds: 300), () {
+      int current = 0;
+      final target = widget.calculatedTotalScore;
+      const duration = Duration(milliseconds: 30); // speed of increment
+
+      Timer.periodic(duration, (timer) {
+        if (current >= target) {
+          timer.cancel();
+        } else {
+          setState(() {
+            current++;
+            _animatedScore = current;
+          });
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   String _getSeverity(int score) {
-    if (score <= 20) return "Your responses indicate that you have a Low Risk for digestive issues";
-    if (score <= 35) return "Your responses indicate that you have a Moderate Risk for digestive issues";
-    if (score <= 39) return "Your responses indicate that you have a High Risk for digestive issues";
+    if (score <= 20)
+      return "Your responses indicate that you have a Low Risk for digestive issues";
+    if (score <= 35)
+      return "Your responses indicate that you have a Moderate Risk for digestive issues";
+    if (score <= 39)
+      return "Your responses indicate that you have a High Risk for digestive issues";
     return "Your responses indicate that you have a Very High Risk for digestive issues";
   }
 
@@ -49,12 +110,13 @@ class SurveyResultScreen extends StatelessWidget {
 
   Map<String, String> _buildRiskLevels() {
     final Map<String, String> riskLevels = {
-      for (var q in surveyQuestions) q.resultCategory: "Not At Risk"
+      for (var q in widget.questions) q.resultCategory: "Not At Risk"
     };
 
-    responses.forEach((index, response) {
-      final question = surveyQuestions[index];
-      final score = _getMarksFromResponse(question, response);
+    for (int i = 0; i < widget.questions.length; i++) {
+      final question = widget.questions[i];
+      final response = widget.responses[i];
+      final score = getMarksFromResponse(question, response!);
 
       if (score >= 1) {
         riskLevels[question.resultCategory] = switch (score) {
@@ -65,30 +127,23 @@ class SurveyResultScreen extends StatelessWidget {
           _ => "Not At Risk",
         };
       }
-    });
+    }
 
     return riskLevels;
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final calculatedTotalScore = responses.entries.fold<int>(0, (sum, entry) {
-      final question = surveyQuestions[entry.key];
-      final score = _getMarksFromResponse(question, entry.value);
-      return sum + score;
-    });
-
-    final severity = _getSeverity(calculatedTotalScore);
-    final severityColor = _getSeverityColor(calculatedTotalScore);
+    final severity = _getSeverity(_animatedScore);
+    final severityColor = _getSeverityColor(_animatedScore);
     final riskLevels = _buildRiskLevels();
 
     final questionDetails = List<Map<String, dynamic>>.generate(
-      surveyQuestions.length,
-          (index) {
-        final question = surveyQuestions[index];
-        final response = responses[index] ?? "No response";
-        final score = _getMarksFromResponse(question, response);
+      widget.questions.length,
+      (index) {
+        final question = widget.questions[index];
+        final response = widget.responses[index];
+        final score = getMarksFromResponse(question, response!);
         final risk = riskLevels[question.resultCategory] ?? "Not At Risk";
 
         return {
@@ -100,90 +155,149 @@ class SurveyResultScreen extends StatelessWidget {
       },
     );
 
-    return WillPopScope(
-      onWillPop: () async {
-        Get.offAll(() => const NavigationMenu());
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: Colors.green.shade100,
-        body: Column(
+    List<Color> _getGradientColors(int score) {
+      if (score <= 20) {
+        return [Colors.green.shade100, Colors.green.shade700];
+      } else if (score <= 35) {
+        return [Colors.amber.shade100, Colors.amber.shade700];
+      } else if (score <= 39) {
+        return [Colors.orange.shade100, Colors.orange.shade700];
+      } else {
+        return [Colors.red.shade100, Colors.red.shade300];
+      }
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+            onPressed: () {
+              Get.offAll(NavigationMenu());
+            },
+            icon: Icon(Icons.arrow_back)),
+        automaticallyImplyLeading: false,
+        title: Text("Survey Results",
+            style:
+                GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold)),
+      ),
+      backgroundColor: const Color(0xFFF7F9FA),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PrimaryHeaderContainer(
-              color: Colors.green,
+            Padding(
+              padding: const EdgeInsets.all(20),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CustomAppBar(
-                    showBackArrow: true,
-                    leadingOnPressed: () => Get.offAll(() => const NavigationMenu()),
-                    leadingIcon: Iconsax.arrow_left,
-                    title: Text(
-                      "SURVEY RESULT",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                  const SizedBox(height: 16),
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: _getGradientColors(_animatedScore),
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text("Total Score: ",
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600)),
+                                AnimatedFlipCounter(
+                                  duration: const Duration(seconds: 2),
+                                  value: _animatedScore,
+                                  textStyle: GoogleFonts.poppins(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              severity,
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
+                  Text("Response Summary",
+                      style: GoogleFonts.poppins(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Total Score: $calculatedTotalScore',
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-                    const SizedBox(height: 5),
-                    Text(severity,
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: severityColor,
-                        )),
-                    const SizedBox(height: 8),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: surveyQuestions.length,
-                        itemBuilder: (context, index) {
-                          final question = surveyQuestions[index];
-                          final response = responses[index] ?? "N/A";
-                          final score = _getMarksFromResponse(question, response);
+                padding: const EdgeInsets.only(bottom: 80),
+                child: ListView.builder(
+                  itemCount: widget.questions.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemBuilder: (context, index) {
+                    final question = widget.questions[index];
+                    final response = widget.responses[index];
+                    final score = getMarksFromResponse(question, response!);
+                    final risk = riskLevels[question.resultCategory];
 
-                          return ResponseBox(
-                            questionNumber: index + 1,
-                            question: question.question,
-                            response: response,
-                            score: score,
-                            riskLevel: riskLevels[question.resultCategory],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                    return ResponseBox(
+                      questionNumber: index + 1,
+                      question: question.question,
+                      response: response,
+                      score: score,
+                      riskLevel: risk,
+                    );
+                  },
                 ),
               ),
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Get.to(() => SurveyReport(
-              riskLevels: riskLevels,
-              responses: responses,
-              totalScore: calculatedTotalScore,
-              questionDetails: questionDetails,
-            ));
-          },
-          label: const Text("Get a detailed report", style: TextStyle(fontWeight: FontWeight.bold)),
-          icon: const Icon(Icons.description),
-          backgroundColor: Colors.greenAccent,
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: SizedBox(
+          width: double.infinity,
+          child: FloatingActionButton.extended(
+            onPressed: () {
+              Get.to(
+                () => SurveyReport(
+                  riskLevels: riskLevels,
+                  responses: widget.responses,
+                  totalScore: widget.calculatedTotalScore,
+                  questionDetails: questionDetails,
+                ),
+              );
+            },
+            label: const Text("View Detailed Report",
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+            icon: const Icon(
+              Icons.description_outlined,
+              color: Colors.white,
+            ),
+            backgroundColor: Colors.green.shade600,
+          ),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
@@ -219,26 +333,30 @@ class ResponseBox extends StatelessWidget {
         ? severityColors[score - 1]
         : Colors.grey;
 
-
-    final surveyQuestion = surveySuggestions[questionNumber - 1];
-    final responseSuggestion = surveyQuestion['responses'].firstWhere(
+    final suggestion = () {
+      try {
+        final surveyQuestion = surveySuggestions[questionNumber - 1];
+        final responseSuggestion = surveyQuestion['responses'].firstWhere(
           (resp) => resp['response'] == response,
-      orElse: () => {'suggestion': 'No suggestion available'},
-    );
-    final suggestion = responseSuggestion['suggestion'];
+          orElse: () => {'suggestion': 'No suggestion available'},
+        );
+        return responseSuggestion['suggestion'];
+      } catch (_) {
+        return 'No suggestion available';
+      }
+    }();
+
     final showSuggestion = riskDescription != "Low Risk";
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          border: Border(left: BorderSide(color: boxColor, width: 8)),
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Q$questionNumber: $question", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+            Text("Q$questionNumber: $question",
+                style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text("Your answer: $response", style: GoogleFonts.poppins()),
             const SizedBox(height: 4),
@@ -246,7 +364,8 @@ class ResponseBox extends StatelessWidget {
               children: [
                 Text(
                   riskDescription,
-                  style: TextStyle(color: boxColor, fontWeight: FontWeight.bold),
+                  style:
+                      TextStyle(color: boxColor, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
