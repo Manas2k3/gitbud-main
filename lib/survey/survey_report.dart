@@ -70,7 +70,7 @@ class SurveyReport extends StatefulWidget {
 class _SurveyReportState extends State<SurveyReport> {
   final _auth = FirebaseAuth.instance;
 
-  String name = 'User        ';
+  String name = 'User';
 
   String gender = 'N/A';
 

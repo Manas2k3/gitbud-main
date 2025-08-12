@@ -88,7 +88,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        automaticallyImplyLeading: true,
+        leading: IconButton(onPressed: () => Get.offAll(NavigationMenu()), icon: Icon(Icons.arrow_back)),
         title: Text("Survey Page", style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       backgroundColor: Colors.white,

@@ -1,6 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart'; // Add shimmer import
+
+import '../tongue_analysis/tongue_analysis_page.dart';
+import 'food_swap_image_upload_page.dart';
 
 class FoodSwapResultsPage extends StatelessWidget {
   final String predictedFood;
@@ -18,43 +24,51 @@ class FoodSwapResultsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Swap Suggestions',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-            color: Colors.black,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          Get.offAll(const FoodSwapImageUploadPage());
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Swap Suggestions',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 20,
+              color: Colors.black,
+            ),
           ),
+          centerTitle: true,
+          leading: const BackButton(color: Colors.black),
+          backgroundColor: Colors.white,
+          elevation: 0,
         ),
-        centerTitle: true,
-        leading: const BackButton(color: Colors.black),
         backgroundColor: Colors.white,
-        elevation: 0,
-      ),
-      backgroundColor: Colors.white,
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text(
-            'Scanned Meal',
-            style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          _buildMealCard(
-            title: predictedFood,
-            calories: nutritionInfo['Calories'].toString(),
-            scannedImage: scannedImage,
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Healthier Swaps',
-            style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          ...alternatives.map((alt) => _buildSwapCard(alt)).toList(),
-        ],
+        body: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Text(
+              'Scanned Meal',
+              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            _buildMealCard(
+              title: predictedFood,
+              calories: nutritionInfo['Calories'].toString(),
+              scannedImage: scannedImage,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Healthier Swaps',
+              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            ...alternatives.map((alt) => _buildSwapCard(alt)).toList(),
+          ],
+        ),
       ),
     );
   }
@@ -82,11 +96,20 @@ class FoodSwapResultsPage extends StatelessWidget {
         const SizedBox(width: 12),
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Image.file(
-            scannedImage,
-            height: 80,
-            width: 180,
-            fit: BoxFit.cover,
+          child: FutureBuilder(
+            future: Future.delayed(const Duration(milliseconds: 800)), // Fake load delay
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return _buildShimmer(width: 180, height: 80);
+              } else {
+                return Image.file(
+                  scannedImage,
+                  height: 80,
+                  width: 180,
+                  fit: BoxFit.cover,
+                );
+              }
+            },
           ),
         ),
       ],
@@ -95,6 +118,8 @@ class FoodSwapResultsPage extends StatelessWidget {
 
   Widget _buildSwapCard(Map<String, dynamic> swap) {
     final nutrition = swap['nutritional_info'] ?? {};
+    final imageUrl = swap['image'];
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
@@ -125,10 +150,14 @@ class FoodSwapResultsPage extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
-              swap['image'],
+              imageUrl,
               height: 80,
               width: 180,
               fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return _buildShimmer(width: 180, height: 80);
+              },
               errorBuilder: (context, error, stackTrace) => Container(
                 height: 64,
                 width: 64,
@@ -138,6 +167,21 @@ class FoodSwapResultsPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildShimmer({required double width, required double height}) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
     );
   }

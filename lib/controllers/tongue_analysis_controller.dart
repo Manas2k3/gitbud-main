@@ -49,7 +49,7 @@ class TongueAnalysisController extends GetxController {
     try {
       isLoading.value = true;
 
-      final uri = Uri.parse("https://tongue-analysis.onrender.com/predict");
+      final uri = Uri.parse("https://72f65b857756.ngrok-free.app/predict");
       final request = http.MultipartRequest("POST", uri);
 
       final mimeType = lookupMimeType(imageFile.path);
@@ -74,26 +74,36 @@ class TongueAnalysisController extends GetxController {
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
 
-        final predictedClass = jsonData['predicted_class'];
-        final confidence = jsonData['confidence'];
+        final colorPrediction = jsonData['Color Prediction'] ?? {};
+        final shapePrediction = jsonData['Shape Prediction'] ?? {};
+        final texturePrediction = jsonData['Texture Prediction'] ?? {};
 
-        if (predictedClass != null && confidence != null) {
-          Get.toNamed(
-            "/result",
-            arguments: {
-              "predicted_class": predictedClass,
-              "confidence": confidence,
-              "imageFile": imageFile,
-            },
-          );
-        } else {
-          Get.snackbar("Error", "Unexpected response from server",
-              backgroundColor: Colors.red.shade100, colorText: Colors.black);
-        }
+        final colorResult = colorPrediction['Result'] ?? "unknown (0%)";
+        final colorDescription = colorPrediction['Description'] ?? "No description available.";
+
+        final shapeScore = shapePrediction['Score'] ?? 0.0;
+        final shapeInterpretation = shapePrediction['Interpretation'] ?? "No interpretation available.";
+
+        final textureScore = texturePrediction['Score'] ?? 0.0;
+        final textureInterpretation = texturePrediction['Interpretation'] ?? "No interpretation available.";
+
+        Get.toNamed(
+          "/result",
+          arguments: {
+            "color_result": colorResult,
+            "color_description": colorDescription,
+            "shape_score": shapeScore,
+            "shape_interpretation": shapeInterpretation,
+            "texture_score": textureScore,
+            "texture_interpretation": textureInterpretation,
+            "imageFile": imageFile,
+          },
+        );
       } else {
         Get.snackbar("Error", "Failed to analyze image",
             backgroundColor: Colors.red.shade100, colorText: Colors.black);
       }
+
     } catch (e) {
       isLoading.value = false;
       print(e);

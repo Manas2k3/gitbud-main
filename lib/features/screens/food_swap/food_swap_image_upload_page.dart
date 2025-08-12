@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gibud/navigation_menu.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
@@ -42,7 +43,7 @@ class _FoodSwapImageUploadPageState extends State<FoodSwapImageUploadPage> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: const BackButton(color: Colors.black),
+        leading: IconButton(onPressed: () => Get.offAll(NavigationMenu()), icon: Icon(Icons.arrow_back)),
         centerTitle: true,
       ),
       body: Column(

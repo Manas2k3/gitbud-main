@@ -11,13 +11,13 @@ import '../../utils/popups/full_screen.dart';
 import '../features/screens/food_swap/food_swap_result_screen.dart';
 
 class FoodSwapController extends GetxController {
-
   void _showLoader() {
     FullScreenLoader.openLoadingDialog(
       "Analyzing your meal...",
       AnimationStrings.loadingAnimation,
     );
   }
+
   static FoodSwapController get instance => Get.find();
 
   final Rxn<File> selectedImage = Rxn<File>();
@@ -43,7 +43,7 @@ class FoodSwapController extends GetxController {
         return;
       }
 
-      final uri = Uri.parse("https://food-swap.onrender.com/predict");
+      final uri = Uri.parse("https://food-swap-api-506773688937.asia-south1.run.app/predict");
 
       final request = http.MultipartRequest("POST", uri)
         ..files.add(await http.MultipartFile.fromPath(
@@ -60,12 +60,15 @@ class FoodSwapController extends GetxController {
         final resBody = await response.stream.bytesToString();
         final jsonData = jsonDecode(resBody);
 
-        Get.to(() => FoodSwapResultsPage(
-          predictedFood: jsonData['predicted_food'],
-          nutritionInfo: Map<String, dynamic>.from(jsonData['nutritional_info']),
-          alternatives: List<dynamic>.from(jsonData['alternatives']),
-          scannedImage: image,
-        ));
+        Get.to(
+          () => FoodSwapResultsPage(
+            predictedFood: jsonData['predicted_food'],
+            nutritionInfo:
+                Map<String, dynamic>.from(jsonData['nutritional_info']),
+            alternatives: List<dynamic>.from(jsonData['alternatives']),
+            scannedImage: image,
+          ),
+        );
       } else {
         _showSnackBar(context, "Upload failed");
       }
@@ -74,8 +77,6 @@ class FoodSwapController extends GetxController {
       _showSnackBar(context, "Error occurred: $e");
     }
   }
-
-
 
   void _hideLoader() {
     FullScreenLoader.stopLoading();

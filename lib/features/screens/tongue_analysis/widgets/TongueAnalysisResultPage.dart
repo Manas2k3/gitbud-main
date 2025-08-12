@@ -9,18 +9,27 @@ class TongueAnalysisResultPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final args = Get.arguments ?? {};
-    final String prediction = args['predicted_class']?.toLowerCase() ?? "unknown";
-    final double confidence = args['confidence']?.toDouble() ?? 0.0;
+    final String colorResult = args['color_result'] ?? "";
+    final String colorDescription = args['color_description'] ?? "No description available.";
+
+    final String predictionLabel = colorResult.split(" ").first.toLowerCase();
+
+    final double shapeScore = (args['shape_score'] ?? 0.0).toDouble();
+    final String shapeInterpretation = args['shape_interpretation'] ?? "No interpretation available.";
+
+    final double textureScore = (args['texture_score'] ?? 0.0).toDouble();
+    final String textureInterpretation = args['texture_interpretation'] ?? "No interpretation available.";
+
     final File? imageFile = args['imageFile'];
 
-    // 🌸 Mapping of model output → full condition keys
-    final Map<String, String> labelToDetailKey = {
-      "yellow": "yellow",
-      "purple": "purple",
-      "red": "red_tongue_stroke",
-      "white": "white_tongue_anemia",
-      "deep_red": "deep_red",
-      "indigo_violet": "indigo_violet",
+    // 🌸 Mapping of model output → display label
+    final Map<String, String> labelToDisplay = {
+      "yellow": "Yellow",
+      "purple": "Purple",
+      "red": "Red Tongue Stroke",
+      "white": "White",
+      "deep_red": "Deep Red",
+      "indigo_violet": "Indigo-Violet",
     };
 
     // 💊 Diagnosis details
@@ -37,7 +46,7 @@ class TongueAnalysisResultPage extends StatelessWidget {
         "description": "An unusually shaped red tongue could signify risk of acute stroke. Prompt medical consultation is recommended.",
         "risk": 3,
       },
-      "white_tongue_anemia": {
+      "white": {
         "description": "White tongue is a possible sign of anemia. Consider checking your iron levels and improving nutritional intake.",
         "risk": 2,
       },
@@ -51,102 +60,74 @@ class TongueAnalysisResultPage extends StatelessWidget {
       },
     };
 
-    // 🧠 Final key to use
-    final String? mappedKey = labelToDetailKey[prediction];
-    final detail = mappedKey != null && diagnosisDetails.containsKey(mappedKey)
-        ? diagnosisDetails[mappedKey]
-        : {
-      "description": "No information available for this condition.",
-      "risk": 0,
-    };
+    // 🧠 Final mapped label & detail
+    final String displayLabel = labelToDisplay[predictionLabel] ?? predictionLabel.capitalizeFirst ?? "Unknown";
+    final detail = diagnosisDetails[predictionLabel] ??
+        {
+          "description": "No information available for this condition.",
+          "risk": 0,
+        };
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Tongue Analysis"),
-        leading: IconButton(
-          onPressed: () {
-            Get.offAll(TongueAnalysisPage());
-          },
-          icon: const Icon(Icons.arrow_back),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          Get.offAll(const TongueAnalysisPage());
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Tongue Analysis"),
+          leading: IconButton(
+            onPressed: () {
+              Get.offAll(const TongueAnalysisPage());
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 🏷️ Prediction Title
-            Text(
-              prediction.replaceAll("_", " ").capitalizeFirst ?? "Prediction",
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 🖌 Color Prediction
+              Text(
+                "Color: $displayLabel",
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 4),
+              const SizedBox(height: 4),
+              Text(colorDescription),
+              const SizedBox(height: 16),
 
-            // 📊 Confidence
-            Text(
-              "Confidence: ${confidence.toStringAsFixed(1)}%",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.purple.shade300,
+              // 📏 Shape Prediction
+              Text(
+                "Shape Analysis:",
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 16),
+              Text(shapeInterpretation),
+              const SizedBox(height: 16),
 
-            // 📷 Image
-            if (imageFile != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.file(
-                  imageFile,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+              // 🌿 Texture Prediction
+              Text(
+                "Texture Analysis:",
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-            const SizedBox(height: 12),
+              Text(textureInterpretation),
+              const SizedBox(height: 16),
 
-            const Text(
-              "Tongue Image",
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-            ),
-            const Text(
-              "Uploaded Image",
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-
-            // 🩺 Description
-            Text(
-              detail["description"],
-              style: const TextStyle(fontSize: 15),
-            ),
-            const SizedBox(height: 24),
-
-            // ⚠️ Risk Level
-            const Text(
-              "Risk Level",
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Expanded(
-                  child: LinearProgressIndicator(
-                    value: (detail["risk"] as int) / 3.0,
-                    minHeight: 8,
-                    backgroundColor: Colors.grey.shade300,
-                    color: Colors.redAccent,
+              if (imageFile != null)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    imageFile,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
                 ),
-                const SizedBox(width: 8),
-                Text("${detail["risk"]}"),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
