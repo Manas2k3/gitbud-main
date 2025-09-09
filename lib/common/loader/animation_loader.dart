@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
@@ -9,11 +10,15 @@ class AnimationLoader extends StatefulWidget {
   final String animation;
   final String? infoImagePath;
 
+  // NEW: listenable text for live updates
+  final ValueListenable<String>? listenableText;
+
   const AnimationLoader({
     Key? key,
     required this.text,
     required this.animation,
     this.infoImagePath,
+    this.listenableText,
   }) : super(key: key);
 
   @override
@@ -148,6 +153,27 @@ class _AnimationLoaderState extends State<AnimationLoader>
   Widget build(BuildContext context) {
     final imagePath = _factImages[_currentImageIndex];
 
+    final textWidget = widget.listenableText != null
+        ? ValueListenableBuilder<String>(
+      valueListenable: widget.listenableText!,
+      builder: (context, value, _) => Text(
+        value,
+        style: GoogleFonts.poppins(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    )
+        : Text(
+      widget.text,
+      style: GoogleFonts.poppins(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+      textAlign: TextAlign.center,
+    );
+
     return Center(
       child: SingleChildScrollView(
         child: Column(
@@ -208,14 +234,8 @@ class _AnimationLoaderState extends State<AnimationLoader>
 
             SizedBox(height: MediaQuery.of(context).size.height * 0.2),
 
-            Text(
-              widget.text,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            // 🔁 Live-updating text
+            textWidget,
 
             const SizedBox(height: 20),
 

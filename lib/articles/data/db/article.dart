@@ -171,45 +171,26 @@ The microbiome is a hidden ecosystem within our bodies that significantly influe
     content:
         """In recent years, the importance of gut health has become increasingly recognized in the realm of overall wellness. A healthy gut is essential for digestion, nutrient absorption, immune function, and even mental health. While many people know about the benefits of probiotics and fiber for gut health, there are several surprising foods that can also play a significant role in maintaining a healthy digestive system. Here are ten unexpected foods that promote gut health.
 
-1. Bananas
 
-Bananas are not only a convenient and tasty snack but also a great food for gut health. They contain high levels of fiber and prebiotics, which feed the beneficial bacteria in your gut. Additionally, bananas help maintain the pH balance in the stomach and soothe the digestive tract.
+1.	Bananas: Bananas are not only a convenient and tasty snack but also a great food for gut health. They contain high levels of fiber and prebiotics, which feed the beneficial bacteria in your gut. Additionally, bananas help maintain the pH balance in the stomach and soothe the digestive tract.
 
-2. Garlic
+2.	Apples: Apples are rich in fiber, particularly pectin, a type of soluble fiber that acts as a prebiotic. Pectin promotes the growth of good bacteria in the gut and helps regulate digestion. Apples also have anti-inflammatory properties that can support overall gut health.
 
-Garlic is known for its powerful medicinal properties, including its ability to support gut health. It acts as a prebiotic, promoting the growth of beneficial gut bacteria and suppressing the growth of harmful ones. Garlic also has anti-inflammatory properties, which can help reduce gut inflammation.
+3. Asparagus: Asparagus is another food that provides a good source of prebiotics. It contains inulin, a type of fiber that feeds beneficial bacteria. Asparagus also has anti-inflammatory properties and is rich in antioxidants, which support a healthy digestive system.
 
-3. Ginger
+4.	Garlic: Garlic is known for its powerful medicinal properties, including its ability to support gut health. It acts as a prebiotic, promoting the growth of beneficial gut bacteria and suppressing the growth of harmful ones. Garlic also has anti-inflammatory properties, which can help reduce gut inflammation.
 
-Ginger is commonly used to alleviate nausea, but it also has broader benefits for the digestive system. It aids in digestion by speeding up the movement of food from the stomach to the small intestine and reducing bloating and gas. Ginger also has anti-inflammatory and antioxidant properties that support gut health.
+5.	Ginger: Ginger is commonly used to alleviate nausea, but it also has broader benefits for the digestive system. It aids in digestion by speeding up the movement of food from the stomach to the small intestine and reducing bloating and gas. Ginger also has anti-inflammatory and antioxidant properties that support gut health.
 
-4. Dark Chocolate
+6. Kefir: Kefir is a fermented milk drink that is packed with probiotics. These live bacteria help maintain a healthy balance of gut flora, aiding digestion and boosting the immune system. Kefir can be a great addition to your diet if you are looking to enhance your gut health with probiotics.
 
-Good news for chocolate lovers! Dark chocolate, especially those with a high cocoa content, contains polyphenols that act as prebiotics. These compounds stimulate the growth of beneficial gut bacteria. Just remember to consume dark chocolate in moderation, as it is also high in calories and sugar.
+7.	Sauerkraut: Sauerkraut, a type of fermented cabbage, is an excellent source of probiotics. The fermentation process enhances the availability of beneficial bacteria, which can improve gut health. Sauerkraut also contains fiber and vitamins that support digestive function.
 
-5. Apples
+8. Almonds: Almonds are not only a nutritious snack but also beneficial for gut health. They are high in fiber and act as prebiotics, promoting the growth of healthy bacteria in the gut. Almonds are also rich in healthy fats, vitamins, and minerals that support overall digestive health.
 
-Apples are rich in fiber, particularly pectin, a type of soluble fiber that acts as a prebiotic. Pectin promotes the growth of good bacteria in the gut and helps regulate digestion. Apples also have anti-inflammatory properties that can support overall gut health.
+9. Dark Chocolate: Good news for chocolate lovers! Dark chocolate, especially those with a high cocoa content, contains polyphenols that act as prebiotics. These compounds stimulate the growth of beneficial gut bacteria. Just remember to consume dark chocolate in moderation, as it is also high in calories and sugar.
 
-6. Asparagus
-
-Asparagus is another food that provides a good source of prebiotics. It contains inulin, a type of fiber that feeds beneficial bacteria. Asparagus also has anti-inflammatory properties and is rich in antioxidants, which support a healthy digestive system.
-
-7. Kefir
-
-Kefir is a fermented milk drink that is packed with probiotics. These live bacteria help maintain a healthy balance of gut flora, aiding digestion and boosting the immune system. Kefir can be a great addition to your diet if you are looking to enhance your gut health with probiotics.
-
-8. Almonds
-
-Almonds are not only a nutritious snack but also beneficial for gut health. They are high in fiber and act as prebiotics, promoting the growth of healthy bacteria in the gut. Almonds are also rich in healthy fats, vitamins, and minerals that support overall digestive health.
-
-9. Sauerkraut
-
-Sauerkraut, a type of fermented cabbage, is an excellent source of probiotics. The fermentation process enhances the availability of beneficial bacteria, which can improve gut health. Sauerkraut also contains fiber and vitamins that support digestive function.
-
-10. Bone Broth
-
-Bone broth is a nutrient-dense food that has been praised for its gut-healing properties. It contains gelatin, which can help restore the gut lining and improve digestion. Bone broth is also rich in amino acids, such as glutamine, that support gut health and reduce inflammation.
+10.	Bone Broth: Bone broth is a nutrient-dense food that has been praised for its gut-healing properties. It contains gelatin, which can help restore the gut lining and improve digestion. Bone broth is also rich in amino acids, such as glutamine, that support gut health and reduce inflammation.
 
 Conclusion
 
@@ -873,7 +854,7 @@ While antibiotics are essential for treating bacterial infections, they can disr
       id: 12,
       title: "Probiotics vs. Prebiotics: GUT HEALTH!!",
       imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/gibud-f7cc9.appspot.com/o/articlesImages%2F11.jpg?alt=media&token=56fe53b7-05fb-4c90-964a-963882b1b06b",
+      "https://media.ahmedabadmirror.com/am/uploads/mediaGallery/image/1637483727281.jpg-org",
       subTitle: "how each contributes to a balanced and healthy gut.",
       content:
           """The terms probiotics and prebiotics are often used interchangeably in conversations about gut health, but they refer to very different things. Understanding the distinction between these two can help you make better choices for your digestive health and overall well-being. A balanced and healthy gut is crucial for overall well-being, and both probiotics and prebiotics play essential roles in maintaining this balance. Here's how each contributes to gut health:

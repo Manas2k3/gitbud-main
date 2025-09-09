@@ -180,7 +180,6 @@ class _LoginPageState extends State<LoginPage> {
                   pressedColor: Colors.redAccent.shade100,
                 ),
               ),
-              // Sign Up Section
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

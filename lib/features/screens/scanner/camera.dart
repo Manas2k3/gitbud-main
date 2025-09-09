@@ -135,13 +135,13 @@ class _CameraState extends State<Camera> with TickerProviderStateMixin {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
               child: Text(
                 "This feature is under development and will be available soon.",
                 style: GoogleFonts.poppins(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey,
+                  color: Colors.red,
                 ),
                 textAlign: TextAlign.center,
               ),

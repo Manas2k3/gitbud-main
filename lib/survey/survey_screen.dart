@@ -41,7 +41,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
 
   List<SurveyQuestion> _filteredQuestions() {
     return surveyQuestions.where((q) {
-      return !(q.stringResourceId == 2131820790 && gender != 'Female');
+      return !(q.stringResourceId == 21318207900 && gender != 'Female');
     }).toList();
   }
 
@@ -50,35 +50,23 @@ class _SurveyScreenState extends State<SurveyScreen> {
   void _selectAnswer(SurveyQuestion question, int index, String responseKey) {
     setState(() {
       selectedResponses[index] = responseKey;
-      int marks = _getMarksFromResponse(question, responseKey);
-      surveyController.selectAnswer(index, marks, question);
+      final marks = _getMarksFromResponse(question, responseKey); // reversed scoring already
+      surveyController.selectAnswer(index, marks, question, responseKey); // ✅ pass it
     });
 
     if (index < _filteredQuestions().length - 1) {
-      Future.delayed(Duration(milliseconds: 300), () {
-        _pageController.nextPage(duration: Duration(milliseconds: 400), curve: Curves.easeInOut);
+      Future.delayed(const Duration(milliseconds: 300), () {
+        _pageController.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
       });
     }
   }
 
+
+  /// 🔄 Reversed scoring logic
   int _getMarksFromResponse(SurveyQuestion question, String responseKey) {
     final keys = question.responses.keys.map((e) => e.trim()).toList();
     final index = keys.indexOf(responseKey.trim());
-    return index != -1 ? index + 1 : 0;
-  }
-
-  Future<void> _submitSurvey(BuildContext context) async {
-    int required = _filteredQuestions().length;
-    if (selectedResponses.length == required) {
-      await surveyController.submitSurvey(context);
-      Get.to(SurveyResultScreen(
-        responses: selectedResponses,
-        calculatedTotalScore: surveyController.totalScore.value,
-        questions: _filteredQuestions(),
-      ));
-    } else {
-      Loaders.warningSnackBar(title: "Incomplete", message: "Please answer all questions.");
-    }
+    return index != -1 ? (keys.length - index) : 0; // reverse scoring
   }
 
   @override
@@ -165,7 +153,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               ),
             if (currentIndex == questions.length - 1)
               ElevatedButton(
-                onPressed: () => _submitSurvey(context),
+                onPressed: () => surveyController.submitSurvey(context),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
                   backgroundColor: Colors.green.shade400,

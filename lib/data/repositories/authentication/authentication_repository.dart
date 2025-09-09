@@ -32,26 +32,34 @@ class AuthenticationRepository extends GetxController {
   Future<void> screenRedirect() async {
     User? user = _auth.currentUser;
 
-    /// Check if it's the first time launching the app
     if (user != null) {
-      // If the user is logged in
       if (user.emailVerified) {
-        // Redirect to main navigation screen initially
-        Get.offAll(() => NavigationMenu());
+        // ✅ Check if Firestore document exists
+        final userDoc = await _firestore.collection('Users').doc(user.uid).get();
+
+        if (userDoc.exists) {
+          // Normal flow: user is verified and has Firestore data
+          Get.offAll(() => NavigationMenu());
+        } else {
+          // 🚨 User logged in but no Firestore data
+          await _auth.signOut(); // clear the broken session
+          Get.offAll(() => const SignupPage());
+        }
       } else {
-        // If the user's email is not verified, navigate to the Verify Email screen
+        // Email not verified
         Get.offAll(() => VerifyMail(
           email: _auth.currentUser?.email,
         ));
       }
     } else {
-      // First-time user or logged-out user redirection
+      // First-time user or logged-out user
       deviceStorage.writeIfNull('isFirstTime', true);
       deviceStorage.read('isFirstTime') != true
           ? Get.offAll(() => const LoginPage())
           : Get.offAll(() => const OnboardingPage());
     }
   }
+
 
   /// Function to register credentials with email and password
   Future<UserCredential> registerWithEmailAndPassword(

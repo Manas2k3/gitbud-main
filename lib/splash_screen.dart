@@ -1,10 +1,6 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:gibud/utils/constants/image_strings.dart';
-import 'package:get/get.dart';
-import 'package:gibud/navigation_menu.dart';
-import 'package:gibud/pages/login/login_page.dart';
-import 'package:gibud/pages/onboarding/onboarding.dart';
-import 'data/repositories/authentication/authentication_repository.dart';
+import 'package:gibud/data/repositories/authentication/authentication_repository.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,9 +13,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Start the splash logic (redirect to the appropriate screen)
-    Future.delayed(const Duration(seconds: 3), () {
-      // You can replace this with your screen redirect logic
+
+    Future.delayed(Duration(seconds: 2), () {
       AuthenticationRepository.instance.screenRedirect();
     });
   }
@@ -27,17 +22,23 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade200, // Light color
-
+      backgroundColor: Colors.grey.shade200,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: MediaQuery.of(context).size.height*0.2,),
-            Image.asset("assets/images/splashScreenImage/splash.png", height: 250,),
-            SizedBox(height: MediaQuery.of(context).size.height*0.3),
-            Image.asset("assets/images/splashScreenImage/banner_image.png", height: 150,),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+
+            // Logo with bounce-in effect
+            BounceInDown(
+              duration: const Duration(milliseconds: 1200),
+              child: Image.asset("assets/images/splashScreenImage/splash.png", height: 250),
+            ),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+            FadeInUp(
+              duration: const Duration(milliseconds: 1200),
+              child: Image.asset("assets/images/splashScreenImage/banner_image.png", height: 150),
+            ),
           ],
         ),
       ),

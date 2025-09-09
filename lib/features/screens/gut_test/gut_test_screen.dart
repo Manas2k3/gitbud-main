@@ -2,117 +2,152 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gibud/navigation_menu.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_svg/flutter_svg.dart'; // 👈 Added for SVG support
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:gibud/utils/constants/image_strings.dart';
 import 'package:gibud/common/components/custom_button.dart';
 import 'package:gibud/features/screens/gut_test/widget_pages/additional_details_page.dart';
-import '../../../survey/survey_screen.dart';
+import 'package:gibud/features/screens/tongue_analysis/tongue_analysis_page.dart'; // 🔥 Import TongueAnalysisPage instead
 
 class GutTestScreen extends StatelessWidget {
   const GutTestScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.green.shade50,
-      appBar: AppBar(
-        centerTitle: true,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          Get.offAll(const NavigationMenu());
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.green.shade50,
-        elevation: 0,
-        title: Text(
-          "Gut Test",
-          style: GoogleFonts.poppins(
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.green.shade50,
+          elevation: 0,
+          title: Text(
+            "Gut Test",
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+              fontSize: 18, // slightly larger than before
+            ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// Header title
-              Text(
-                "Instructions for taking Gut Test",
-                style: GoogleFonts.poppins(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Header title
+                Text(
+                  "Instructions for taking Gut Test",
+                  style: GoogleFonts.poppins(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              /// Instruction Cards
-              _buildInstructionCard(
-                iconAsset: ImageStrings.honestImage,
-                title: "Answer honestly",
-                description:
-                "Please answer honestly to help us better understand your gut health, symptoms, and lifestyle.",
-              ),
-              const SizedBox(height: 16),
-              _buildInstructionCard(
-                iconAsset: ImageStrings.lockImage,
-                title: "Confidentiality",
-                description:
-                "Your information is completely confidential and protected under strict data privacy standards.",
-              ),
-              const SizedBox(height: 16),
-              _buildInstructionCard(
-                iconAsset: ImageStrings.informationImage,
-                title: "Informational tool",
-                description:
-                "This survey is meant for informational purposes only and does not replace professional medical advice.",
-              ),
-              const SizedBox(height: 24),
-
-              /// Note
-              Text(
-                "Note: For specific health concerns, always consult with a healthcare professional.",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Colors.black,
+                /// Instruction Cards
+                _buildInstructionCard(
+                  iconAsset: ImageStrings.honestImage,
+                  title: "Answer honestly",
+                  description:
+                  "Please answer honestly to help us better understand your gut health, symptoms, and lifestyle.",
                 ),
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height*0.07),
+                const SizedBox(height: 16),
+                _buildInstructionCard(
+                  iconAsset: ImageStrings.lockImage,
+                  title: "Confidentiality",
+                  description:
+                  "Your information is completely confidential and protected under strict data privacy standards.",
+                ),
+                const SizedBox(height: 16),
+                _buildInstructionCard(
+                  iconAsset: ImageStrings.informationImage,
+                  title: "Informational tool",
+                  description:
+                  "This survey is meant for informational purposes only and does not replace professional medical advice.",
+                ),
+                const SizedBox(height: 30),
 
-              /// Start Button
-              Center(
-                child: CustomButton(
-                  buttonText: 'Start Gut Health Test',
-                  onTap: () async {
-                    try {
-                      final user = FirebaseAuth.instance.currentUser;
-                      if (user == null) return;
+                /// Start Button - 🔥 Modified to route to TongueAnalysisPage
+                Center(
+                  child: CustomButton(
+                    buttonText: 'Start Gut Health Test',
+                    onTap: () async {
+                      try {
+                        final user = FirebaseAuth.instance.currentUser;
+                        if (user == null) return;
 
-                      final docSnapshot = await FirebaseFirestore.instance
-                          .collection('Users')
-                          .doc(user.uid)
-                          .get();
+                        final docSnapshot = await FirebaseFirestore.instance
+                            .collection('Users')
+                            .doc(user.uid)
+                            .get();
 
-                      final data = docSnapshot.data();
-                      if (data != null &&
-                          data.containsKey('gender') &&
-                          data['gender'] != null) {
-                        Get.to(() => SurveyScreen());
-                      } else {
-                        Get.to(() => AdditionalDetailsPage());
+                        final data = docSnapshot.data();
+                        if (data != null &&
+                            data.containsKey('gender') &&
+                            data['gender'] != null) {
+                          // 🔥 Route to TongueAnalysisPage instead of SurveyScreen
+                          Get.to(() => TongueAnalysisPage());
+                        } else {
+                          Get.to(() => AdditionalDetailsPage());
+                        }
+                      } catch (e) {
+                        debugPrint("🔥 Error checking gender field: $e");
                       }
-                    } catch (e) {
-                      debugPrint("🔥 Error checking gender field: $e");
-                    }
-                  },
-                  initialColor: Colors.green,
-                  pressedColor: Colors.greenAccent.shade100,
+                    },
+                    initialColor: Colors.green,
+                    pressedColor: Colors.greenAccent.shade100,
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 32),
-            ],
+                const SizedBox(height: 32),
+
+                /// Note Section (styled container)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.yellow.shade100, // soft background highlight
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.yellow.shade700, width: 0.8),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        color: Colors.black87,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "Consult a healthcare professional for any specific health concerns.",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: Colors.black87,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: MediaQuery.of(context).size.height * 0.07),
+              ],
+            ),
           ),
         ),
       ),
@@ -133,9 +168,9 @@ class GutTestScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 4,
+            color: Colors.grey.withOpacity(0.2), // lighter shadow
+            spreadRadius: 1,
+            blurRadius: 3,
             offset: const Offset(0, 2),
           ),
         ],

@@ -15,6 +15,7 @@ import '../../../pages/privacy_policy_page.dart';
 import '../../../survey/recent_reports.dart';
 import '../../../utils/popups/loaders.dart';
 import '../../../data/repositories/authentication/authentication_repository.dart';
+import 'delete_account_page.dart';
 
 class SettingsScreen extends StatefulWidget {
   SettingsScreen({super.key});
@@ -513,6 +514,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Logout',
                   subtitle: '',
                   onTap: () => _showLogoutConfirmationDialog(context),
+                ),
+                const SizedBox(height: 16),
+
+                _buildSettingTile(
+                  icon: Iconsax.profile_delete,
+                  title: 'Delete Account',
+                  subtitle: 'Permanently remove your data',
+                  onTap: () => Get.to(() => const DeleteAccountPage()),
                 ),
                 const SizedBox(height: 20),
                 if (_appVersion != null)

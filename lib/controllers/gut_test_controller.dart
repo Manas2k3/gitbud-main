@@ -70,7 +70,7 @@ class GutTestController extends GetxController {
         Get.off(() => SurveyResultScreen(
           responses: selectedResponses,
           calculatedTotalScore: surveyController.totalScore.value,
-          questions: filteredQuestions,
+          questions: filteredQuestions, percentageScore: 00,
         ));
       }
     } catch (e) {
@@ -112,7 +112,7 @@ class GutTestController extends GetxController {
         Get.to(() => SurveyResultScreen(
           responses: selectedResponses,
           calculatedTotalScore: surveyController.totalScore.value,
-          questions: filteredQuestions,
+          questions: filteredQuestions, percentageScore: 00,
         ));
       } else {
         FullScreenLoader.stopLoading();

@@ -27,6 +27,10 @@
 -keep class com.itgsa.opensdk.** { *; }
 -dontwarn com.itgsa.opensdk.**
 
+# for in app image cropping
+-keep class com.yalantis.ucrop.** { *; }
+
+
 # Paisa (Google InApp Client)
 -keep class com.google.android.apps.nbu.paisa.inapp.client.api.** { *; }
 
@@ -48,7 +52,7 @@
 # Ignore missing classes from deferred components / dynamic delivery
 -dontwarn com.google.android.play.core.splitcompat.**
 -dontwarn com.google.android.play.core.splitinstall.**
--dontwarn com.google.android.play.core.tasks.**
+-dontwarn com.google.android.play.core.tasks.** 
 
 # Suppress warnings for unused Java desktop APIs (common)
 -dontwarn java.beans.**

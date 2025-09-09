@@ -102,11 +102,6 @@ class _HomePageState extends State<HomePage> {
       'image': ImageStrings.foodSwapImage,
       'navigateTo': FoodSwapImageUploadPage(),
     },
-    {
-      'title': 'Insights That Start With Your Tongue',
-      'image': ImageStrings.tongueAnalysisImage,
-      'navigateTo': TongueAnalysisPage(),
-    },
   ];
 
   final FirebaseAuth _auth = FirebaseAuth.instance;

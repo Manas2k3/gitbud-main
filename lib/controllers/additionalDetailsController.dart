@@ -7,6 +7,7 @@ import 'package:gibud/survey/survey_screen.dart';
 import '../../../utils/constants/animation_strings.dart';
 import '../../../utils/popups/full_screen.dart';
 import '../../../utils/popups/loaders.dart';
+import '../features/screens/tongue_analysis/tongue_analysis_page.dart';
 
 class AdditionalDetailsController extends GetxController {
   static AdditionalDetailsController get instance => Get.find();
@@ -61,7 +62,7 @@ class AdditionalDetailsController extends GetxController {
       );
 
       // Navigate or perform action after update
-      Get.to(SurveyScreen()); // or Get.to(NextPage());
+      Get.to(TongueAnalysisPage()); // or Get.to(NextPage());
     } catch (e) {
       FullScreenLoader.stopLoading();
       print('Error updating additional details: $e');

@@ -48,11 +48,29 @@ Future<void> main() async {
   // 🔐 Auth Repository Binding
   Get.put(AuthenticationRepository());
 
+  //await deleteUserSurveys("hq6bgmGWZuM7TOG8ymqHgStOEwv1");
 
   // 📲 OneSignal Push Token Save
   await _getPushSubscriptionIdAndStore();
   // 🚀 Launch App
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
+}
+
+Future<void> deleteUserSurveys(String userId) async {
+  final batch = FirebaseFirestore.instance.batch();
+
+  final query = await FirebaseFirestore.instance
+      .collection('Surveys')
+      .where('userId', isEqualTo: userId)
+      .get();
+
+  for (var doc in query.docs) {
+    batch.delete(doc.reference);
+  }
+
+  await batch.commit();
+  print("✅ Deleted all survey docs for userId: $userId");
 }
 
 Future<void> _getPushSubscriptionIdAndStore() async {
