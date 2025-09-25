@@ -24,11 +24,11 @@ class GeminiService {
 
     // 2.0 Flash for speed and low-latency UX
     _modelVision = GenerativeModel(model: 'gemini-2.0-flash', apiKey: apiKey);
-    _modelText   = GenerativeModel(model: 'gemini-2.0-flash', apiKey: apiKey);
+    _modelText = GenerativeModel(model: 'gemini-2.0-flash', apiKey: apiKey);
   }
 
   // ---------------------------------------------------------------------------
-  // SURVEY SUGGESTIONS (unchanged)
+  // SURVEY SUGGESTIONS
   // ---------------------------------------------------------------------------
 
   /// Survey → AI suggestions (plain-language, non-diagnostic).
@@ -182,19 +182,10 @@ RETURN STRICT JSON:
   }
 
   // ---------------------------------------------------------------------------
-  // IMAGE ANALYSIS (unchanged behavior)
+  // IMAGE ANALYSIS
   // ---------------------------------------------------------------------------
 
   /// Analyze SHAPE & TEXTURE directly from the uploaded tongue image (client-side Gemini).
-  /// Returns a packed map you can drop into your controller/UI.
-  ///
-  /// {
-  ///   "shape": {"Label": "...", "Score": double},
-  ///   "texture": {"Label": "...", "Score": double},
-  ///   "shape_ai": {explanation, suggestions[], disclaimer},
-  ///   "texture_ai": {explanation, suggestions[], disclaimer},
-  ///   "combined_summary": {summary, red_flags[]}
-  /// }
   static Future<Map<String, dynamic>> analyzeShapeTextureFromImage(File imageFile) async {
     ensureInitialized();
     if (_modelVision == null) {
@@ -271,6 +262,171 @@ Rules:
       "texture_ai": textureAI,
       "combined_summary": combined,
     };
+  }
+
+  /// NEW — verify whether the provided image is a clear tongue photo.
+  ///
+  /// Returns:
+  /// { 'isTongue': bool, 'confidence': double (0.0 - 1.0), 'detail': Map<String,dynamic> }
+  ///
+  /// NOTE: fallback is conservative — if Gemini isn't initialized or verification fails,
+  /// this method returns isTongue: false to block analysis (safer).
+  static Future<Map<String, dynamic>> verifyIsTongue(File imageFile) async {
+    ensureInitialized();
+    // If Gemini not initialized, return conservative fallback => block analysis.
+    if (_modelVision == null) {
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print('Gemini not initialized; returning conservative non-tongue fallback.');
+      }
+      return {
+        'isTongue': false,
+        'confidence': 0.0,
+        'detail': {'note': 'gemini not initialized - conservative fallback (blocks analysis)'}
+      };
+    }
+
+    final bytes = await imageFile.readAsBytes();
+    final mime = _guessMime(imageFile.path) ?? 'image/jpeg';
+
+    // Prompt: ask for strict JSON with isTongue + confidence (0..1) + reason
+    final promptText = """
+You are a reliable vision assistant. Given the attached image, answer whether this is a clear, well-captured photo of a human tongue (showing most of the tongue surface, tip-to-root, in focus, and not obviously occluded).
+
+RETURN STRICT JSON ONLY with this exact shape:
+{
+  "isTongue": true | false,
+  "confidence": 0.0 - 1.0,
+  "reason": "Short explanation of the main reason for the decision (lighting, angle, occlusion, not a tongue).",
+  "details": { /* optional: any extra diagnostic hints for dev */ }
+}
+
+Be concise. Do not include any extra text outside the JSON object.
+""";
+
+    final prompt = TextPart(promptText);
+    final imagePart = DataPart(mime, bytes);
+
+    try {
+      final resp = await _modelVision!.generateContent([
+        Content.multi([prompt, imagePart]),
+      ]);
+
+      final raw = resp.text ?? "{}";
+      Map<String, dynamic> parsed;
+      try {
+        parsed = jsonDecode(_extractJson(raw));
+      } catch (e) {
+        parsed = {};
+      }
+
+      // Coerce fields safely:
+      final isTongueRaw = parsed['isTongue'];
+      final confidenceRaw = parsed['confidence'];
+      final reason = (parsed['reason'] ?? parsed['explanation'] ?? '').toString();
+      final details = (parsed['details'] is Map) ? Map<String, dynamic>.from(parsed['details']) : {'raw': parsed};
+
+      final bool isTongue = (isTongueRaw is bool) ? isTongueRaw : (isTongueRaw?.toString().toLowerCase() == 'true');
+      double confidence = 0.0;
+      if (confidenceRaw is num) {
+        confidence = (confidenceRaw as num).toDouble();
+      } else if (confidenceRaw is String) {
+        confidence = double.tryParse(confidenceRaw) ?? 0.0;
+      } else {
+        // If model returned 0-100, convert to 0-1
+        final possiblePct = parsed['confidence_percent'] ?? parsed['confidence_pct'] ?? parsed['confidence_score'];
+        if (possiblePct is num) {
+          final v = (possiblePct as num).toDouble();
+          if (v > 1.0) confidence = (v / 100.0).clamp(0.0, 1.0);
+        }
+      }
+      confidence = confidence.clamp(0.0, 1.0);
+
+      return {
+        'isTongue': isTongue ?? false,
+        'confidence': confidence,
+        'detail': {
+          'reason': reason,
+          ...details,
+        }
+      };
+    } catch (e) {
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print('verifyIsTongue failed: $e');
+      }
+      // Conservative fallback: block analysis
+      return {
+        'isTongue': false,
+        'confidence': 0.0,
+        'detail': {'note': 'verification failed, conservative fallback blocks analysis', 'error': e.toString()}
+      };
+    }
+  }
+
+  /// NEW — classify color from the image using Gemini vision.
+  /// Returns: { "label": String, "score": int (0-100), "raw": Map }
+  static Future<Map<String, dynamic>> analyzeColorFromImage(File imageFile) async {
+    ensureInitialized();
+    if (_modelVision == null) {
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print('Gemini not initialized; analyzeColorFromImage returning fallback.');
+      }
+      return {"label": "unknown", "score": 0, "raw": {"note": "gemini not initialized"}};
+    }
+
+    final bytes = await imageFile.readAsBytes();
+    final mime = _guessMime(imageFile.path) ?? 'image/jpeg';
+
+    final prompt = """
+You are a careful wellness assistant. Given the attached tongue image, identify the dominant tongue color as a short label and return a confidence score 0-100.
+
+Return STRICT JSON only, shape:
+{
+  "color": { "label": "white | deep_red | purple | healthy | pale | yellow | coated | other", "score": 0-100 },
+  "reason": "Short note about why (lighting, coating, hue)."
+}
+Be concise and return only JSON.
+""";
+
+    final textPart = TextPart(prompt);
+    final imagePart = DataPart(mime, bytes);
+
+    try {
+      final resp = await _modelVision!.generateContent([
+        Content.multi([textPart, imagePart]),
+      ]);
+
+      final raw = resp.text ?? "{}";
+      Map<String, dynamic> parsed;
+      try {
+        parsed = jsonDecode(_extractJson(raw));
+      } catch (_) {
+        parsed = {};
+      }
+
+      final c = (parsed['color'] is Map) ? Map<String, dynamic>.from(parsed['color']) : {};
+      String label = (c['label'] ?? c['Label'] ?? parsed['color']?.toString() ?? 'unknown').toString();
+      int score = 0;
+      final possibleScore = c['score'] ?? c['confidence'] ?? parsed['score'];
+      if (possibleScore is num) score = (possibleScore as num).toInt().clamp(0, 100);
+      if (possibleScore is String) score = int.tryParse(possibleScore) ?? 0;
+
+      label = label.toLowerCase().trim();
+
+      return {
+        "label": label.isEmpty ? "unknown" : label,
+        "score": score,
+        "raw": parsed,
+      };
+    } catch (e) {
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print("analyzeColorFromImage failed: $e");
+      }
+      return {"label": "unknown", "score": 0, "raw": {"error": e.toString()}};
+    }
   }
 
   /// Text-only helper (kept for backwards compatibility).
@@ -373,13 +529,6 @@ Return STRICT JSON:
   }
 
   /// ENHANCED — medical-style (but plain) report JSON.
-  ///
-  /// NOTE: We keep previous keys for backward compatibility:
-  /// - summary, color, shape, texture, tips, diet, disclaimer
-  /// and we ADD richer sections under:
-  /// - interpretation{overall,gut_links,possible_contributors}
-  /// - recommendations{oral_hygiene,hydration,diet_do,diet_limit,lifestyle}
-  /// - risk{level,recheck_in,red_flags}
   static Future<Map<String, dynamic>> buildLaymanReport({
     required String colorLabel,
     double? colorScore,
@@ -390,7 +539,7 @@ Return STRICT JSON:
   }) async {
     ensureInitialized();
 
-    final color   = await colorInsights(label: colorLabel, score: colorScore);
+    final color = await colorInsights(label: colorLabel, score: colorScore);
     final shapeAI = await shapeTextureInsights(
       type: "shape",
       label: shapeLabel,
@@ -441,14 +590,21 @@ Return STRICT JSON:
           }),
         ].take(5).toList(),
         "diet": {
-          "do": ["Hydrate regularly", "Add curd/yogurt or buttermilk",
-            "Include fresh fruits/veg", "Eat at regular times"],
-          "limit": ["Very spicy/fried foods", "Excess alcohol",
-            "Overly hot beverages", "Late-night heavy meals"]
+          "do": [
+            "Hydrate regularly",
+            "Add curd/yogurt or buttermilk",
+            "Include fresh fruits/veg",
+            "Eat at regular times"
+          ],
+          "limit": [
+            "Very spicy/fried foods",
+            "Excess alcohol",
+            "Overly hot beverages",
+            "Late-night heavy meals"
+          ]
         },
         "interpretation": {
-          "overall":
-          "Findings are consistent with common lifestyle factors. No diagnostic statements.",
+          "overall": "Findings are consistent with common lifestyle factors. No diagnostic statements.",
           "gut_links": [
             "Hydration and regular meals support tongue coating balance.",
             "Spicy or very hot foods may temporarily deepen color."
@@ -456,9 +612,7 @@ Return STRICT JSON:
           "possible_contributors": ["recent spicy foods", "mild dehydration"]
         },
         "recommendations": {
-          "oral_hygiene": [
-            "Gently brush/scrape tongue once daily using a soft tool."
-          ],
+          "oral_hygiene": ["Gently brush/scrape tongue once daily using a soft tool."],
           "hydration": ["Sip water throughout the day; aim for pale urine."],
           "diet_do": ["Simple probiotic sources (curd/yogurt) 3–4×/week"],
           "diet_limit": ["Deep-fried items; extra chilli for a few days"],
@@ -520,7 +674,7 @@ Rules:
 """;
 
     try {
-      final res  = await _modelText!.generateContent([Content.text(prompt)]);
+      final res = await _modelText!.generateContent([Content.text(prompt)]);
       final root = jsonDecode(_extractJson(res.text ?? "{}"));
 
       // Ensure compatibility keys + overwrite labels/confidence with our inputs
@@ -566,7 +720,7 @@ Rules:
   static Map<String, dynamic> _coerceLabelScore(dynamic v) {
     if (v is! Map) return {"label": "normal", "score": 0};
     final lbl = (v["label"] ?? "normal").toString();
-    final sc  = v["score"];
+    final sc = v["score"];
     int score = 0;
     if (sc is num) score = sc.clamp(0, 100).toInt();
     if (sc is String) score = int.tryParse(sc) ?? 0;

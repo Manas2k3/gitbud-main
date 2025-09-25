@@ -9,8 +9,8 @@ class Loaders {
     required String title,
     required String message,
   }) {
-    Get.snackbar(animationDuration: Duration(milliseconds: 1000),
-      duration: Duration(milliseconds: 1000),
+    Get.snackbar(animationDuration: Duration(milliseconds: 1500),
+      duration: Duration(milliseconds: 1500),
       title,
       message,
       isDismissible: true,
@@ -29,8 +29,8 @@ class Loaders {
     required String message,
   }) {
     Get.snackbar(
-      animationDuration: Duration(milliseconds: 1000),
-      duration: Duration(milliseconds: 1000),
+      animationDuration: Duration(milliseconds: 1500),
+      duration: Duration(milliseconds: 1500),
       title,
       message,
       isDismissible: true,
@@ -49,8 +49,8 @@ class Loaders {
     required String message,
   }) {
     Get.snackbar(
-      animationDuration: Duration(milliseconds: 1000),
-      duration: Duration(milliseconds: 1000),
+      animationDuration: Duration(milliseconds: 1500),
+      duration: Duration(milliseconds: 1500),
       title,
       message,
       isDismissible: true,

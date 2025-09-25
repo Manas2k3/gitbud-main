@@ -1,3 +1,4 @@
+// lib/features/tongue_analysis/tongueAnalysisPage.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,13 +23,19 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
+  @override
+  void initState() {
+    super.initState();
+    // Register the pick-sheet callback so controller can auto-open it on Retry
+    controller.registerPickImageCallback(_showPickSheet);
+  }
+
   Future<File?> _cropImage(XFile picked) async {
     try {
       final CroppedFile? cropped = await ImageCropper().cropImage(
         sourcePath: picked.path,
         compressFormat: ImageCompressFormat.jpg,
         compressQuality: 90,
-        // Global (top-level) aspectRatio is optional; we’ll set presets per-platform below
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Adjust crop',
@@ -36,9 +43,7 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
             toolbarWidgetColor: Colors.white,
             activeControlsWidgetColor: const Color(0xFF7B61FF),
             lockAspectRatio: false,
-            // set true to force the selected ratio
             hideBottomControls: false,
-            // Show the preset menu like Instagram
             aspectRatioPresets: [
               CropAspectRatioPreset.square,
               CropAspectRatioPreset.ratio4x3,
@@ -47,7 +52,6 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
               CropAspectRatioPreset.original,
             ],
             initAspectRatio: CropAspectRatioPreset.square,
-            // Circle avatar vibe? Switch to CropStyle.circle.
             cropStyle: CropStyle.rectangle,
           ),
           IOSUiSettings(
@@ -55,18 +59,16 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
             aspectRatioPickerButtonHidden: false,
             resetAspectRatioEnabled: true,
             aspectRatioLockEnabled: false,
-            // iOS supports one custom preset + built-ins; but square is built-in already.
             aspectRatioPresets: const [
               CropAspectRatioPreset.square,
               CropAspectRatioPreset.original,
             ],
-            cropStyle: CropStyle.rectangle, // or CropStyle.circle
+            cropStyle: CropStyle.rectangle,
           ),
         ],
       );
 
       if (cropped == null) {
-        // user cancelled or platform returned null
         return null;
       }
       return File(cropped.path);
@@ -151,20 +153,19 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
     final double imageHeight = MediaQuery.of(context).size.height * 0.40;
     final double imageWidth = MediaQuery.of(context).size.width * 0.9;
 
-      return PopScope(
-        canPop: !controller.isLoading.value,
-        onPopInvokedWithResult: (didPop, result) {
-          // Runs whenever a back action was attempted
-          if (!didPop && controller.isLoading.value) {
-            Get.snackbar(
-              "Please wait",
-              "Analysis is still in progress…",
-              backgroundColor: Colors.orange.shade100,
-              colorText: Colors.black,
-            );
-          }
-        },
-        child: Scaffold(
+    return PopScope(
+      canPop: !controller.isLoading.value,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && controller.isLoading.value) {
+          Get.snackbar(
+            "Please wait",
+            "Analysis is still in progress…",
+            backgroundColor: Colors.orange.shade100,
+            colorText: Colors.black,
+          );
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           leading: IconButton(
@@ -194,7 +195,7 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
                 ),
               ),
               const SizedBox(height: 20),
-        
+
               // Unified Upload Block
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -253,9 +254,9 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
                   ],
                 ),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               // Preview
               Text(
                 _selectedImage != null ? "Selected Image" : "Sample Image",
@@ -270,21 +271,21 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
                 borderRadius: BorderRadius.circular(16),
                 child: _selectedImage != null
                     ? Image.file(
-                        _selectedImage!,
-                        height: imageHeight,
-                        width: imageWidth,
-                        fit: BoxFit.cover,
-                      )
+                  _selectedImage!,
+                  height: imageHeight,
+                  width: imageWidth,
+                  fit: BoxFit.cover,
+                )
                     : Image.asset(
-                        ImageStrings.sampleTongueImage,
-                        height: imageHeight,
-                        width: imageWidth,
-                        fit: BoxFit.cover,
-                      ),
+                  ImageStrings.sampleTongueImage,
+                  height: imageHeight,
+                  width: imageWidth,
+                  fit: BoxFit.cover,
+                ),
               ),
-        
+
               const SizedBox(height: 14),
-        
+
               // Guidance
               Container(
                 width: double.infinity,
@@ -321,9 +322,9 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
                   ],
                 ),
               ),
-        
+
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-        
+
               // Scan CTA
               Obx(() {
                 final busy = controller.isLoading.value;
@@ -333,17 +334,17 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
                     onPressed: busy
                         ? null
                         : () {
-                            if (_selectedImage == null) {
-                              Get.snackbar(
-                                "Image Required",
-                                "Please upload an image first.",
-                                backgroundColor: Colors.orange.shade100,
-                                colorText: Colors.black,
-                              );
-                              return;
-                            }
-                            controller.analyzeImage(_selectedImage); // File?
-                          },
+                      if (_selectedImage == null) {
+                        Get.snackbar(
+                          "Image Required",
+                          "Please upload an image first.",
+                          backgroundColor: Colors.orange.shade100,
+                          colorText: Colors.black,
+                        );
+                        return;
+                      }
+                      controller.analyzeImage(_selectedImage); // File?
+                    },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -352,30 +353,30 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
                     ),
                     child: busy
                         ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.black)),
-                          )
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                          AlwaysStoppedAnimation<Color>(Colors.black)),
+                    )
                         : const Text(
-                            "Scan Now",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
+                      "Scan Now",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                 );
               }),
-        
+
               SizedBox(height: MediaQuery.of(context).size.height * 0.03),
             ],
           ),
         ),
-            ),
-      );
+      ),
+    );
   }
 }
 

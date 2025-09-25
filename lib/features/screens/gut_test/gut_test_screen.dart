@@ -24,10 +24,10 @@ class GutTestScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.green.shade50,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.green.shade50,
+          backgroundColor: Colors.white,
           elevation: 0,
           title: Text(
             "Gut Test",

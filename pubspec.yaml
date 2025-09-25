@@ -2,7 +2,7 @@ name: gibud
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 2.0.0+68
+version: 2.0.2+71
 environment:
   sdk: ^3.5.2
 
@@ -73,6 +73,7 @@ dependencies:
   animate_do: ^4.2.0
   in_app_update: ^4.2.3
   upgrader: ^11.5.0
+  firebase_remote_config: ^5.5.0
 
 #  flutter_local_notifications: ^18.0.1
 

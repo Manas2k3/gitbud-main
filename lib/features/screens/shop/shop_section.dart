@@ -11,7 +11,7 @@ class ShopSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.indigo.shade100,
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [

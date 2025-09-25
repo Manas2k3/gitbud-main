@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:gibud/pages/signup/widgets/details_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:gibud/utils/popups/full_screen.dart';
@@ -17,6 +18,7 @@ class PhoneAuthController extends GetxController {
 
   late final TextEditingController phoneNumber;
   final verificationId = ''.obs;
+  static const String otpPhoneKey = 'otp_phone';
   final otpSent = false.obs;
   final userId = FirebaseFirestore.instance.collection('Users').doc().id;
 
@@ -78,14 +80,18 @@ class PhoneAuthController extends GetxController {
   }
 
   /// Send OTP or Navigate Based on Country
-  Future<void> handlePhoneAuth(BuildContext context, String fullPhoneNumber, String countryCode) async {
-    if (!isValidPhoneNumber(fullPhoneNumber, countryCode)) {
+  Future<void> handlePhoneAuth(BuildContext context, String phoneWithoutCountry, String countryCode) async {
+    // phoneWithoutCountry is the raw number entered, countryCode is e.g. '+91'
+    if (!isValidPhoneNumber(phoneWithoutCountry, countryCode)) {
       Loaders.errorSnackBar(
         title: "Invalid Phone Number",
         message: "Enter a valid phone number for your region.",
       );
       return;
     }
+
+    final storage = GetStorage();
+    final canonicalPhone = '$countryCode$phoneWithoutCountry';
 
     if (countryCode == '+91') {
       /// Proceed with OTP for Indian numbers
@@ -95,7 +101,7 @@ class PhoneAuthController extends GetxController {
       );
 
       final otp = generateOtp();
-      final sent = await sendOtpSms(otp, fullPhoneNumber);
+      final sent = await sendOtpSms(otp, canonicalPhone);
 
       FullScreenLoader.stopLoading();
 
@@ -107,15 +113,22 @@ class PhoneAuthController extends GetxController {
         return;
       }
 
+      // Save OTP + phone in memory
       verificationId.value = otp;
       otpSent.value = true;
+
+      // Save canonical phone in GetStorage temporarily
+      await storage.write(otpPhoneKey, canonicalPhone);
 
       Get.to(() => OtpPage(isSignup: true));
     } else {
       /// Navigate to EmailAuthPage for non-Indian numbers
+      // For non-Indian flow if you still want to remember the number:
+      await storage.write(otpPhoneKey, canonicalPhone);
       Get.to(() => EmailAuth());
     }
   }
+
 
   /// Verify OTP
   Future<void> verifyOtp(BuildContext context, String enteredOtp) async {
@@ -141,6 +154,10 @@ class PhoneAuthController extends GetxController {
         message: 'Consider logging in instead of creating a new account',
       );
     } else {
+      // keep the OTP phone in storage so DetailsPage can check it.
+      // If you want to remove it here, uncomment:
+      // await GetStorage().remove(otpPhoneKey);
+
       Get.offAll(() => DetailsPage());
       Loaders.successSnackBar(
         title: "Verification Successful",
@@ -148,4 +165,5 @@ class PhoneAuthController extends GetxController {
       );
     }
   }
+
 }

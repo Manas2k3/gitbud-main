@@ -1,5 +1,8 @@
+// main.dart
+
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -14,7 +17,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<void> main() async {
-
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   // 🌟 Initialize Firebase FIRST
@@ -48,30 +50,54 @@ Future<void> main() async {
   // 🔐 Auth Repository Binding
   Get.put(AuthenticationRepository());
 
-  //await deleteUserSurveys("hq6bgmGWZuM7TOG8ymqHgStOEwv1");
-
-  // 📲 OneSignal Push Token Save
-  await _getPushSubscriptionIdAndStore();
-  // 🚀 Launch App
+  // Load env (you had this in your original main; keep it)
   await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
-}
 
-Future<void> deleteUserSurveys(String userId) async {
-  final batch = FirebaseFirestore.instance.batch();
+  // ---------------------------
+  // 🔎 Fetch min_app_version from Firebase Remote Config
+  // ---------------------------
+  String remoteMinVersion = '2.0.1'; // default fallback
 
-  final query = await FirebaseFirestore.instance
-      .collection('Surveys')
-      .where('userId', isEqualTo: userId)
-      .get();
+  try {
+    final remoteConfig = FirebaseRemoteConfig.instance;
 
-  for (var doc in query.docs) {
-    batch.delete(doc.reference);
+    // Tune these settings as needed (shorter fetch interval for critical updates)
+    await remoteConfig.setConfigSettings(RemoteConfigSettings(
+      fetchTimeout: const Duration(seconds: 10),
+      minimumFetchInterval: const Duration(minutes: 5),
+    ));
+
+    // Try fetching + activating
+    final fetched = await remoteConfig.fetchAndActivate();
+    if (fetched) {
+      final value = remoteConfig.getString('min_app_version').trim();
+      if (value.isNotEmpty) {
+        remoteMinVersion = value;
+        debugPrint("✅ Remote Config min_app_version loaded: $remoteMinVersion");
+      } else {
+        debugPrint("⚠️ Remote Config param 'min_app_version' is empty — using fallback $remoteMinVersion");
+      }
+    } else {
+      // fetchAndActivate returned false: maybe cache used, still try to read param
+      final value = remoteConfig.getString('min_app_version').trim();
+      if (value.isNotEmpty) {
+        remoteMinVersion = value;
+        debugPrint("ℹ️ Remote Config returned cached min_app_version: $remoteMinVersion");
+      } else {
+        debugPrint("⚠️ Remote Config fetch did not activate and param empty — using fallback $remoteMinVersion");
+      }
+    }
+  } catch (e) {
+    debugPrint("❌ Failed to fetch Remote Config: $e — using fallback min version $remoteMinVersion");
   }
 
-  await batch.commit();
-  print("✅ Deleted all survey docs for userId: $userId");
+  // 📲 OneSignal Push Token Save (keeps the original flow)
+  await _getPushSubscriptionIdAndStore();
+
+  // 🚀 Launch App with remoteMinVersion
+  runApp(MyApp(remoteMinVersion: remoteMinVersion));
 }
+
 
 Future<void> _getPushSubscriptionIdAndStore() async {
   final currentUser = FirebaseAuth.instance.currentUser;
@@ -94,4 +120,3 @@ Future<void> _getPushSubscriptionIdAndStore() async {
     debugPrint("⚠️ No user logged in. Cannot fetch OneSignal Push Subscription ID.");
   }
 }
-

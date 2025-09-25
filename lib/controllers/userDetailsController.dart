@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:gibud/navigation_menu.dart';
 import 'package:gibud/pages/login/login_page.dart';
 import 'package:gibud/utils/constants/animation_strings.dart';
@@ -43,6 +44,20 @@ class Userdetailscontroller extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // GetStorage key for OTP phone
+  static const String otpPhoneKey = 'otp_phone';
+
+  @override
+  void onClose() {
+    // Dispose controllers
+    password.dispose();
+    email.dispose();
+    firstName.dispose();
+    lastName.dispose();
+    phoneNumber.dispose();
+    super.onClose();
+  }
+
   /// Main method to handle form submission
   void sendDetails(BuildContext context) async {
     try {
@@ -61,12 +76,39 @@ class Userdetailscontroller extends GetxController {
       }
 
       // Validate form
-      if (!userDetailFormKey.currentState!.validate()) {
+      if (!(userDetailFormKey.currentState?.validate() ?? false)) {
         FullScreenLoader.stopLoading();
         return;
       }
 
-      // Create user account
+      // Normalize combinedPhoneNumber: ensure no spaces
+      combinedPhoneNumber = combinedPhoneNumber.replaceAll(' ', '').trim();
+
+      // Read stored OTP phone from GetStorage
+      final storage = GetStorage();
+      final storedOtpPhone = storage.read('otp_phone') as String?;
+      if (storedOtpPhone != null) Text("OTP sent to: $storedOtpPhone");
+
+      if (storedOtpPhone == null) {
+        FullScreenLoader.stopLoading();
+        Loaders.errorSnackBar(
+          title: "Session Expired",
+          message: "OTP session expired. Please request OTP again.",
+        );
+        return;
+      }
+
+      // Compare canonical formats (both should include country code, e.g. '+91XXXXXXXXXX')
+      if (storedOtpPhone.trim() != combinedPhoneNumber) {
+        FullScreenLoader.stopLoading();
+        Loaders.errorSnackBar(
+          title: "Phone Mismatch",
+          message: "The phone number you entered does not match the number used for OTP. Please enter the same number.",
+        );
+        return;
+      }
+
+      // Create user account (email/password)
       final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email.text.trim(),
         password: password.text.trim(),
@@ -75,6 +117,7 @@ class Userdetailscontroller extends GetxController {
       final user = userCredential.user;
 
       if (user != null) {
+        // Send verification email using your repository helper
         await AuthenticationRepository.instance.sendEmailVerification();
 
         final newUser = UserModel(
@@ -90,6 +133,7 @@ class Userdetailscontroller extends GetxController {
         final userRepository = Get.put(UserRepository());
         await userRepository.savedUserRecord(newUser);
 
+        // Optional: verify user doc exists
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('Users')
             .doc(newUser.id)
@@ -99,9 +143,13 @@ class Userdetailscontroller extends GetxController {
           print('Name fetched: ${userDoc['name'] ?? ''}');
         }
 
+        // Store OneSignal player ID in user's doc
         await _getPushSubscriptionIdAndStore();
 
         FullScreenLoader.stopLoading();
+
+        // Remove stored OTP phone since we've used it successfully
+        await storage.remove(otpPhoneKey);
 
         Loaders.successSnackBar(
           title: "Email Sent",
@@ -110,6 +158,7 @@ class Userdetailscontroller extends GetxController {
 
         Get.offAll(() => VerifyMail(email: email.text.trim()));
       } else {
+        FullScreenLoader.stopLoading();
         throw Exception("Failed to create user.");
       }
     } on FirebaseAuthException catch (e) {
@@ -148,10 +197,7 @@ class Userdetailscontroller extends GetxController {
     }
   }
 
-
-
   /// Function to get OneSignal Push Subscription ID and store it in Firestore
-// Function to get OneSignal Push Subscription ID and store it in Firestore
   Future<void> _getPushSubscriptionIdAndStore() async {
     // Check if the user is logged in
     final currentUser = FirebaseAuth.instance.currentUser;

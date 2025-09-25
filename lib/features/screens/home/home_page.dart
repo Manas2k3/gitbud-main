@@ -222,7 +222,7 @@ class _HomePageState extends State<HomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue.shade50,
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         title: Text(
           "Hey ${name.split(' ').first},",
@@ -252,7 +252,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      backgroundColor: Colors.blue.shade50,
+      backgroundColor: Colors.white,
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(color: Colors.blue),

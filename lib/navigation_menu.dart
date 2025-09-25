@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gibud/features/screens/Scanner/camera.dart';
 import 'package:gibud/features/screens/gut_test/gut_test_screen.dart';
 import 'package:gibud/features/screens/home/home_page.dart';
-import 'package:gibud/features/screens/kids/kids_section.dart';
 import 'package:gibud/features/screens/shop/shop_section.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -16,59 +14,53 @@ class NavigationMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(NavigationController());
 
-    // Define colors for each page
-    final List<Color> navigationColors = [
-      Colors.blue.shade50,
-      Colors.green.shade50,
-      Colors.grey.shade50,
-      Colors.indigo.shade100,
-      Colors.grey.shade50
-    ];
-
-    // Define colors without shade for border and active item color
-    final List<Color> baseColors = [
-      Colors.blueGrey,
-      Colors.green.shade400,
-      Colors.grey.shade400,
+    // Different active colors for each tab
+    final List<Color> activeColors = [
+      Colors.blue,
+      Colors.green,
       Colors.indigo,
-      Colors.red.shade400
+      Colors.red,
     ];
 
     return Scaffold(
       bottomNavigationBar: Obx(
-            () => Container(
-              height: MediaQuery.of(context).size.height*0.1,
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
-                color: baseColors[controller.selectedIndex.value],
-                width: 0.5, // Adjust the width as needed
-              ),
+            () => NavigationBar(
+          backgroundColor: Colors.white, // static white background
+          height: 80,
+          elevation: 0,
+          selectedIndex: controller.selectedIndex.value,
+          indicatorColor: Colors.transparent, // remove default indicator pill
+          onDestinationSelected: (index) => controller.selectedIndex.value = index,
+          destinations: [
+            NavigationDestination(
+              icon: controller.selectedIndex.value == 0
+                  ? Icon(Icons.home, color: activeColors[0])
+                  : const Icon(Icons.home_outlined, color: Colors.grey),
+              label: "Home",
             ),
-          ),
-          child: NavigationBar(
-            backgroundColor: navigationColors[controller.selectedIndex.value],
-            height: 80,
-            elevation: 0,
-            selectedIndex: controller.selectedIndex.value,
-            indicatorColor: baseColors[controller.selectedIndex.value], // Active color
-            onDestinationSelected: (index) => controller.selectedIndex.value = index,
-            destinations: [
-              NavigationDestination(icon: Icon(Icons.home_outlined), label: "Home"),
-              NavigationDestination(icon: Icon(Iconsax.activity), label: "Gut Test"),
-              NavigationDestination(icon: Icon(Iconsax.scan), label: "Scanner"),
-              NavigationDestination(icon: Icon(Iconsax.shop), label: "Shop"),
-              // NavigationDestination(icon: Icon(Icons.child_care), label: "Kids"),
-              NavigationDestination(icon: Icon(Iconsax.profile_2user), label: "Profile"),
-            ],
-          ),
+            NavigationDestination(
+              icon: controller.selectedIndex.value == 1
+                  ? Icon(Iconsax.activity5, color: activeColors[1])
+                  : const Icon(Iconsax.activity, color: Colors.grey),
+              label: "Gut Test",
+            ),
+            NavigationDestination(
+              icon: controller.selectedIndex.value == 2
+                  ? Icon(Iconsax.shop5, color: activeColors[2])
+                  : const Icon(Iconsax.shop, color: Colors.grey),
+              label: "Shop",
+            ),
+            NavigationDestination(
+              icon: controller.selectedIndex.value == 3
+                  ? Icon(Iconsax.profile_2user5, color: activeColors[3])
+                  : const Icon(Iconsax.profile_2user, color: Colors.grey),
+              label: "Profile",
+            ),
+          ],
         ),
       ),
       body: Obx(
-            () => Container(
-          color: navigationColors[controller.selectedIndex.value],
-          child: controller.screens[controller.selectedIndex.value],
-        ),
+            () => controller.screens[controller.selectedIndex.value],
       ),
     );
   }
@@ -79,8 +71,7 @@ class NavigationController extends GetxController {
   final screens = [
     HomePage(),
     GutTestScreen(),
-    Camera(),
     ShopSection(),
-    SettingsScreen()
+    SettingsScreen(),
   ];
 }

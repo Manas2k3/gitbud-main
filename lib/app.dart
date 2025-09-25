@@ -3,22 +3,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'package:upgrader/upgrader.dart';
+
 import 'package:gibud/bindings/general_bindings.dart';
 import 'package:gibud/splash_screen.dart';
-import 'package:upgrader/upgrader.dart';
 
 import 'chat/individual_chat_page.dart';
 import 'features/screens/home/home_page.dart';
 import 'features/screens/tongue_analysis/widgets/TongueAnalysisResultPage.dart';
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  // Accept remote-provided minimum version (nullable)
+  final String? remoteMinVersion;
+  const MyApp({super.key, this.remoteMinVersion});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  String get _minVersion => (widget.remoteMinVersion != null && widget.remoteMinVersion!.isNotEmpty)
+      ? widget.remoteMinVersion!
+      : '2.0.1'; // fallback if remote not available
+
   @override
   Widget build(BuildContext context) {
     // Uncomment this for dev testing to reset upgrader cache
@@ -29,9 +36,8 @@ class _MyAppState extends State<MyApp> {
         debugLogging: true,
         debugDisplayOnce: true,
         durationUntilAlertAgain: const Duration(days: 1),
-        // This forces an update if current version < minAppVersion
-        minAppVersion: '2.0.1',
-        // languageCode: 'en', // optional+
+        // Use runtime-provided min version (ignores +build metadata)
+        minAppVersion: _minVersion,
         willDisplayUpgrade: ({
           required bool display,
           String? installedVersion,
@@ -41,7 +47,6 @@ class _MyAppState extends State<MyApp> {
             'Will display upgrade? $display (installed=$installedVersion, store=${versionInfo?.appStoreVersion})',
           );
         },
-
       ),
       child: GetMaterialApp(
         getPages: [
