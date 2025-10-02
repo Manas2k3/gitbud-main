@@ -401,10 +401,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      // backgroundColor removed — gradient will do the magic
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color(0xFFFFEBEE),
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: Text(
           'Profile',
@@ -414,136 +416,157 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _getUserData(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildLoadingShimmer();
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text("Error loading data 💥", style: GoogleFonts.poppins()),
-            );
-          }
-
-          if (!snapshot.hasData || snapshot.data == null) {
-            return Center(
-              child: Text("No user data found 🫠", style: GoogleFonts.poppins()),
-            );
-          }
-
-          final data = snapshot.data!;
-          final name = data['name'] ?? 'Unnamed';
-          final email = data['email'] ?? 'Email missing';
-          final effectivePhotoUrl =
-              _photoUrl ?? data['photoUrl'] ?? kDefaultAvatarUrl;
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-
-                // Avatar (editable, network default)
-                _buildProfileAvatar(effectivePhotoUrl),
-
-                const SizedBox(height: 16),
-
-                Text(
-                  name,
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
+      body: Stack(
+        children: [
+          // ❤️ Gradient background (light red → white)
+          const Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFFFEBEE), // very soft pinkish red
+                    Colors.white,      // fades to clean white
+                  ],
                 ),
-                Text(
-                  email,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
+              ),
+            ),
+          ),
 
-                const SizedBox(height: 15),
+          // 🔹 Your original FutureBuilder content
+          FutureBuilder<Map<String, dynamic>>(
+            future: _getUserData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return _buildLoadingShimmer();
+              }
 
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Account Settings",
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text("Error loading data 💥", style: GoogleFonts.poppins()),
+                );
+              }
 
-                const SizedBox(height: 20),
+              if (!snapshot.hasData || snapshot.data == null) {
+                return Center(
+                  child: Text("No user data found 🫠", style: GoogleFonts.poppins()),
+                );
+              }
 
-                _buildSettingTile(
-                  icon: Iconsax.document,
-                  title: 'Reports',
-                  subtitle: 'View your past survey results',
-                  onTap: () {
-                    final userId = _auth.currentUser?.uid;
-                    if (userId != null) {
-                      Get.to(() => RecentReportsPage(userId: userId));
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
+              final data = snapshot.data!;
+              final name = data['name'] ?? 'Unnamed';
+              final email = data['email'] ?? 'Email missing';
+              final effectivePhotoUrl =
+                  _photoUrl ?? data['photoUrl'] ?? kDefaultAvatarUrl;
 
-                _buildSettingTile(
-                  icon: Iconsax.shield_tick,
-                  title: 'Privacy',
-                  subtitle: 'Manage your data and preferences',
-                  onTap: () => Get.to(() => PrivacyPolicyPage()),
-                ),
-                const SizedBox(height: 16),
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
 
-                _buildSettingTile(
-                  icon: Iconsax.star,
-                  title: 'Rate Us',
-                  subtitle: 'Share your feedback',
-                  onTap: rateUs,
-                ),
-                const SizedBox(height: 16),
+                    // Avatar (editable, network default)
+                    _buildProfileAvatar(effectivePhotoUrl),
 
-                _buildSettingTile(
-                  icon: Iconsax.logout,
-                  title: 'Logout',
-                  subtitle: '',
-                  onTap: () => _showLogoutConfirmationDialog(context),
-                ),
-                const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                _buildSettingTile(
-                  icon: Iconsax.profile_delete,
-                  title: 'Delete Account',
-                  subtitle: 'Permanently remove your data',
-                  onTap: () => Get.to(() => const DeleteAccountPage()),
-                ),
-                const SizedBox(height: 20),
-                if (_appVersion != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      "App Version: $_appVersion",
+                    Text(
+                      name,
                       style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
+                    Text(
+                      email,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
 
-              ],
-            ),
-          );
-        },
+                    const SizedBox(height: 15),
+
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Account Settings",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    _buildSettingTile(
+                      icon: Iconsax.document,
+                      title: 'Reports',
+                      subtitle: 'View your past survey results',
+                      onTap: () {
+                        final userId = _auth.currentUser?.uid;
+                        if (userId != null) {
+                          Get.to(() => RecentReportsPage(userId: userId));
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildSettingTile(
+                      icon: Iconsax.shield_tick,
+                      title: 'Privacy',
+                      subtitle: 'Manage your data and preferences',
+                      onTap: () => Get.to(() => PrivacyPolicyPage()),
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildSettingTile(
+                      icon: Iconsax.star,
+                      title: 'Rate Us',
+                      subtitle: 'Share your feedback',
+                      onTap: rateUs,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildSettingTile(
+                      icon: Iconsax.logout,
+                      title: 'Logout',
+                      subtitle: '',
+                      onTap: () => _showLogoutConfirmationDialog(context),
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildSettingTile(
+                      icon: Iconsax.profile_delete,
+                      title: 'Delete Account',
+                      subtitle: 'Permanently remove your data',
+                      onTap: () => Get.to(() => const DeleteAccountPage()),
+                    ),
+                    const SizedBox(height: 20),
+                    if (_appVersion != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          "App Version: $_appVersion",
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
+
 
   Widget _buildSettingTile({
     required IconData icon,

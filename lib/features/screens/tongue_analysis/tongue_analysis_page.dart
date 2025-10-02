@@ -80,21 +80,20 @@ class _TongueAnalysisPageState extends State<TongueAnalysisPage> {
     }
   }
 
-  Future<void> _pickFrom(ImageSource source) async {
+  Future<void> _pickFrom(ImageSource source, {CameraDevice cameraDevice = CameraDevice.rear}) async {
     final XFile? image = await _picker.pickImage(
       source: source,
       imageQuality: 85,
-      preferredCameraDevice: CameraDevice.front,
+      preferredCameraDevice: cameraDevice,
     );
     if (image == null) return;
 
     final File? cropped = await _cropImage(image);
     if (cropped != null) {
       setState(() => _selectedImage = cropped);
-      // If you want instant upload after crop:
-      // controller.analyzeImage(cropped);
     }
   }
+
 
   Future<void> _recropCurrent() async {
     if (_selectedImage == null) return;

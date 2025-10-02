@@ -15,10 +15,10 @@ class AdditionalDetailsPage extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     InputDecoration _inputDecoration(String label) => InputDecoration(
-      labelText: label,
+      hintText: label,
       filled: true,
       fillColor: Colors.red.shade50,
-      labelStyle: GoogleFonts.poppins(color: Colors.red.shade300),
+      hintStyle: GoogleFonts.poppins(color: Colors.red.shade300),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
@@ -135,12 +135,20 @@ class AdditionalDetailsPage extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
         child: SizedBox(
           width: double.infinity,
-          child: CustomButton(
-            buttonText: "Continue",
-            initialColor: Colors.redAccent,
-            pressedColor: Colors.redAccent.shade100,
-            onTap: () => controller.updateAdditionalDetails(context),
-          ),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 30),
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: StadiumBorder(),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 8, vertical:15
+                  )
+                ),
+                onPressed: () => controller.updateAdditionalDetails(context), child: Text("Continue")),
+          )
         ),
       ),
     );

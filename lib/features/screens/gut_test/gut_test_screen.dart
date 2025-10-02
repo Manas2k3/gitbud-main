@@ -24,135 +24,154 @@ class GutTestScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        // backgroundColor removed — gradient will handle it
         appBar: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.white,
+          backgroundColor: Color(0xFFE9F8EC), // was: Colors.white
           elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
           title: Text(
             "Gut Test",
             style: GoogleFonts.poppins(
               color: Colors.black,
               fontWeight: FontWeight.w600,
-              fontSize: 18, // slightly larger than before
+              fontSize: 18,
             ),
           ),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// Header title
-                Text(
-                  "Instructions for taking Gut Test",
-                  style: GoogleFonts.poppins(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20,
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                /// Instruction Cards
-                _buildInstructionCard(
-                  iconAsset: ImageStrings.honestImage,
-                  title: "Answer honestly",
-                  description:
-                  "Please answer honestly to help us better understand your gut health, symptoms, and lifestyle.",
-                ),
-                const SizedBox(height: 16),
-                _buildInstructionCard(
-                  iconAsset: ImageStrings.lockImage,
-                  title: "Confidentiality",
-                  description:
-                  "Your information is completely confidential and protected under strict data privacy standards.",
-                ),
-                const SizedBox(height: 16),
-                _buildInstructionCard(
-                  iconAsset: ImageStrings.informationImage,
-                  title: "Informational tool",
-                  description:
-                  "This survey is meant for informational purposes only and does not replace professional medical advice.",
-                ),
-                const SizedBox(height: 30),
-
-                /// Start Button - 🔥 Modified to route to TongueAnalysisPage
-                Center(
-                  child: CustomButton(
-                    buttonText: 'Start Gut Health Test',
-                    onTap: () async {
-                      try {
-                        final user = FirebaseAuth.instance.currentUser;
-                        if (user == null) return;
-
-                        final docSnapshot = await FirebaseFirestore.instance
-                            .collection('Users')
-                            .doc(user.uid)
-                            .get();
-
-                        final data = docSnapshot.data();
-                        if (data != null &&
-                            data.containsKey('gender') &&
-                            data['gender'] != null) {
-                          // 🔥 Route to TongueAnalysisPage instead of SurveyScreen
-                          Get.to(() => TongueAnalysisPage());
-                        } else {
-                          Get.to(() => AdditionalDetailsPage());
-                        }
-                      } catch (e) {
-                        debugPrint("🔥 Error checking gender field: $e");
-                      }
-                    },
-                    initialColor: Colors.green,
-                    pressedColor: Colors.greenAccent.shade100,
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                /// Note Section (styled container)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.yellow.shade100, // soft background highlight
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.yellow.shade700, width: 0.8),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        Icons.info_outline,
-                        color: Colors.black87,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          "Consult a healthcare professional for any specific health concerns.",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                            color: Colors.black87,
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
+        body: Stack(
+          children: [
+            // 💚 Gradient background: light green → white
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xFFE9F8EC), // soft light green
+                      Colors.white,      // fade to white
                     ],
                   ),
                 ),
-
-                SizedBox(height: MediaQuery.of(context).size.height * 0.07),
-              ],
+              ),
             ),
-          ),
+
+            // Your original content
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// Header title
+                    Text(
+                      "Instructions for taking Gut Test",
+                      style: GoogleFonts.poppins(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    /// Instruction Cards
+                    _buildInstructionCard(
+                      iconAsset: ImageStrings.honestImage,
+                      title: "Answer honestly",
+                      description:
+                      "Please answer honestly to help us better understand your gut health, symptoms, and lifestyle.",
+                    ),
+                    const SizedBox(height: 16),
+                    _buildInstructionCard(
+                      iconAsset: ImageStrings.lockImage,
+                      title: "Confidentiality",
+                      description:
+                      "Your information is completely confidential and protected under strict data privacy standards.",
+                    ),
+                    const SizedBox(height: 16),
+                    _buildInstructionCard(
+                      iconAsset: ImageStrings.informationImage,
+                      title: "Informational tool",
+                      description:
+                      "This survey is meant for informational purposes only and does not replace professional medical advice.",
+                    ),
+                    const SizedBox(height: 30),
+
+                    /// Start Button
+                    Center(
+                      child: CustomButton(
+                        buttonText: 'Start Gut Health Test',
+                        onTap: () async {
+                          try {
+                            final user = FirebaseAuth.instance.currentUser;
+                            if (user == null) return;
+
+                            final docSnapshot = await FirebaseFirestore.instance
+                                .collection('Users')
+                                .doc(user.uid)
+                                .get();
+
+                            final data = docSnapshot.data();
+                            if (data != null &&
+                                data.containsKey('gender') &&
+                                data['gender'] != null) {
+                              Get.to(() => TongueAnalysisPage()); // 🔥
+                            } else {
+                              Get.to(() => AdditionalDetailsPage());
+                            }
+                          } catch (e) {
+                            debugPrint("🔥 Error checking gender field: $e");
+                          }
+                        },
+                        initialColor: Colors.green,
+                        pressedColor: Colors.greenAccent.shade100,
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    /// Note Section
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.yellow.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.yellow.shade700, width: 0.8),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.info_outline, color: Colors.black87, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "Consult a healthcare professional for any specific health concerns.",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Colors.black87,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.07),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
 
   /// Helper widget for instruction cards
   Widget _buildInstructionCard({

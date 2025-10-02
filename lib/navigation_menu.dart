@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gibud/features/screens/food_swap/food_swap_image_upload_page.dart';
 import 'package:gibud/features/screens/gut_test/gut_test_screen.dart';
 import 'package:gibud/features/screens/home/home_page.dart';
 import 'package:gibud/features/screens/shop/shop_section.dart';
@@ -46,9 +47,9 @@ class NavigationMenu extends StatelessWidget {
             ),
             NavigationDestination(
               icon: controller.selectedIndex.value == 2
-                  ? Icon(Iconsax.shop5, color: activeColors[2])
-                  : const Icon(Iconsax.shop, color: Colors.grey),
-              label: "Shop",
+                  ? Icon(Icons.fastfood, color: activeColors[2])
+                  : const Icon(Icons.fastfood_outlined, color: Colors.grey),
+              label: "Food Swap",
             ),
             NavigationDestination(
               icon: controller.selectedIndex.value == 3
@@ -71,7 +72,7 @@ class NavigationController extends GetxController {
   final screens = [
     HomePage(),
     GutTestScreen(),
-    ShopSection(),
+    FoodSwapImageUploadPage(),
     SettingsScreen(),
   ];
 }

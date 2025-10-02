@@ -80,7 +80,7 @@ class _DetailsPageState extends State<DetailsPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16), // Spacing between the fields
+                        const SizedBox(width: 12), // Spacing between the fields
                         Expanded(
                           child: Theme(
                             data: Theme.of(context).copyWith(
@@ -348,7 +348,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     ),
                   ),
                 ),
-                SizedBox(width: 16), // Add spacing between the two containers
+                SizedBox(width: 12), // Add spacing between the two containers
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
